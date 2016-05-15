@@ -28,17 +28,18 @@ type Col = [Cell]
 type Row = [Cell]
 
 
-size = 5
--- axes
+-- axis
 xs = ['a'..]
-ys = [1..size]
 
 initBoard :: Int -> Board
-initBoard size = take (size ^ 2) [Cell x y [] | x <- xs, y <- ys]
+initBoard size = take (size ^ 2) [Cell x y [] | x <- xs, y <- [1..size]]
 
+
+getSize :: Board -> Int
+getSize = truncate . sqrt . fromIntegral . length
 
 toCols :: Board -> [Col]
-toCols b = chunksOf size b
+toCols b = chunksOf (getSize b) b
 
 toRows :: Board -> [Row]
 toRows = transpose . toCols
@@ -54,17 +55,19 @@ showBoardWithYAxis :: Board -> String
 showBoardWithYAxis = unlines . reverse . map showRowWithY . toRows
 
 showBoardWithAxes :: Board -> String
-showBoardWithAxes b = showBoardWithYAxis b ++ "  " ++ showXAxis
+showBoardWithAxes b = showBoardWithYAxis b ++ "  " ++ showXAxis b
 
 showRowWithY :: Row -> String
 showRowWithY r = (show y) ++ " " ++ showRow r
   where
     (Cell _ y _) = head r
 
-showXAxis :: String
-showXAxis = unwords $ map (\x -> x : []) $ take size xs
+showXAxis :: Board -> String
+showXAxis b = unwords $ map (\x -> x : []) $ take (getSize b) xs
 
 
 main = do
   putStrLn "Welcome to Tak.hs"
-  putStrLn $ showBoardWithAxes $ initBoard size
+  putStrLn "Size of the board?"
+  size <- getLine
+  putStrLn $ showBoardWithAxes $ initBoard (read size :: Int)
