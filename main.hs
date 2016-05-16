@@ -82,14 +82,16 @@ showCells = unwords . map show
 
 -- 97 = ASCII 'a'
 showColByX :: Board -> Char -> String
-showColByX b x = showCells $ cols !! (ord x - 97)
+showColByX b x = col ++ "\n" ++ showYAxis b
   where
     cols = toCols b
+    col = showCells . reverse $ cols !! (ord x - 97)
 
 showRowByY :: Board -> Int -> String
-showRowByY b y = showCells $ rows !! (y - 1)
+showRowByY b y = row ++ "\n" ++ showXAxis b
   where
-    rows = reverse $ toRows b
+    rows = toRows b
+    row = showCells $ rows !! (y - 1)
 
 showBoardWithYAxis :: Board -> String
 showBoardWithYAxis = unlines . reverse . map showRowWithY . toRows
@@ -101,6 +103,10 @@ showRowWithY :: Row -> String
 showRowWithY r = (show y) ++ " " ++ showCells r
   where
     (Cell _ y _) = head r
+
+-- horizontally
+showYAxis :: Board -> String
+showYAxis b = unwords $ map show $ reverse $ take (getSize b) [1..]
 
 showXAxis :: Board -> String
 showXAxis b = unwords $ map (\x -> x : []) $ take (getSize b) xs
@@ -126,30 +132,31 @@ stackStone (x:y) c@(Cell cx cy _) = if x == cx && (read y :: Int) == cy
 
 -- IO
 
-handleShow :: Board -> String -> IO ()
+handleShow :: Board -> String -> (Board, String)
 handleShow b coord = do
   case isDigit $ head coord of
-    True  -> putStrLn $ showRowByY b $ read coord
-    False -> putStrLn $ showColByX b $ head coord
+    True  -> (b, showRowByY b $ read coord)
+    False -> (b, showColByX b $ head coord)
 
-handlePlace :: Board -> Coord -> IO ()
+handlePlace :: Board -> Coord -> (Board, String)
 handlePlace b coord = do
   case isValidCoord b coord of
-    True -> putStrLn $ showBoardWithAxes $ placeStone b coord
-    False -> putStrLn "Wrong coordinates xy"
+    True -> (placeStone b coord, showBoardWithAxes $ placeStone b coord)
+    False -> (b, "Wrong coordinates xy")
 
-handleAction :: Board -> Action -> IO ()
+handleAction :: Board -> Action -> (Board, String)
 handleAction b a = do
   case a of
     (Action "show" (coord:cs)) -> handleShow b coord
     (Action "place" (coord:cs)) -> handlePlace b coord
-    _ -> putStrLn "Unknown action"
+    _ -> (b, "Unknown action")
 
 loop :: Board -> Player -> IO ()
 loop b p = do
   action <- prompt $ show p ++ ">"
-  handleAction b $ parseAction action
-  loop b p
+  let tup = handleAction b $ parseAction action
+  putStrLn $ snd tup
+  loop (fst tup) p
 
 prompt :: String -> IO String
 prompt q = do
