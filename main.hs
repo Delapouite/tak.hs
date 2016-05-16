@@ -8,6 +8,7 @@
 
 import Data.List (transpose)
 import Data.List.Split (chunksOf)
+import System.IO (hFlush, stdout)
 
 data Player = P1 | P2 deriving (Show)
 
@@ -65,9 +66,16 @@ showRowWithY r = (show y) ++ " " ++ showRow r
 showXAxis :: Board -> String
 showXAxis b = unwords $ map (\x -> x : []) $ take (getSize b) xs
 
+prompt q = do
+  putStr $ q ++ " "
+  -- http://stackoverflow.com/questions/21853343/haskell-putstr-vs-putstrln-and-instruction-order
+  hFlush stdout
+  a <- getLine
+  return a
 
 main = do
   putStrLn "Welcome to Tak.hs"
-  putStrLn "Size of the board?"
-  size <- getLine
+  size <- prompt "Size of the board?"
   putStrLn $ showBoardWithAxes $ initBoard (read size :: Int)
+  action <- prompt "P1>"
+  putStrLn action
