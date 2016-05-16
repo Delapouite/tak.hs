@@ -6,9 +6,12 @@
 -- 1
 --  a b c
 
+import Data.Char (isDigit, ord)
 import Data.List (transpose)
 import Data.List.Split (chunksOf)
 import System.IO (hFlush, stdout)
+
+-- types
 
 data Player = P1 | P2 deriving (Show)
 
@@ -49,10 +52,21 @@ toRows = transpose . toCols
 -- display
 
 showBoard :: Board -> String
-showBoard = unlines . reverse . map showRow . toRows
+showBoard = unlines . reverse . map showCells . toRows
 
-showRow :: Row -> String
-showRow = unwords . map show
+showCells :: [Cell] -> String
+showCells = unwords . map show
+
+-- 97 = ASCII 'a'
+showColByX :: Board -> Char -> String
+showColByX b x = showCells $ cols !! (ord x - 97)
+  where
+    cols = toCols b
+
+showRowByY :: Board -> Int -> String
+showRowByY b y = showCells $ rows !! (y - 1)
+  where
+    rows = reverse $ toRows b
 
 showBoardWithYAxis :: Board -> String
 showBoardWithYAxis = unlines . reverse . map showRowWithY . toRows
@@ -61,7 +75,7 @@ showBoardWithAxes :: Board -> String
 showBoardWithAxes b = showBoardWithYAxis b ++ "  " ++ showXAxis b
 
 showRowWithY :: Row -> String
-showRowWithY r = (show y) ++ " " ++ showRow r
+showRowWithY r = (show y) ++ " " ++ showCells r
   where
     (Cell _ y _) = head r
 
@@ -77,16 +91,22 @@ parseAction s = Action verb args
 
 -- IO
 
-handleAction :: Action -> IO ()
-handleAction a = do
+handleShow :: Board -> String -> IO ()
+handleShow b coord = do
+  case isDigit $ head coord of
+    True  -> putStrLn $ showRowByY b $ read coord
+    False -> putStrLn $ showColByX b $ head coord
+
+handleAction :: Board -> Action -> IO ()
+handleAction b a = do
   case a of
-    (Action "show" (x:xs)) -> putStrLn $ "Let's show " ++ x
+    (Action "show" (coord:cs)) -> handleShow b coord
     _ -> putStrLn "Unknown action"
 
 loop :: Board -> Player -> IO ()
 loop b p = do
   action <- prompt $ show p ++ ">"
-  handleAction $ parseAction action
+  handleAction b $ parseAction action
   loop b p
 
 prompt :: String -> IO String
