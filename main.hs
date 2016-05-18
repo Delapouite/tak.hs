@@ -143,11 +143,7 @@ parseAction s = Action verb args
     (verb:args) = words s
 
 argToXY :: String -> XY
-argToXY arg = (x, y)
-  where
-    (f:s) = arg
-    x = f
-    y = read s :: Int
+argToXY (x:y) = (x, read y :: Int)
 
 argToXorY :: String -> Either X Y
 argToXorY arg = case isDigit $ head arg of
