@@ -193,8 +193,8 @@ handleShow :: Game -> Either X Y -> (Game, String)
 handleShow g xory = do
   let b = board g
   case xory of
-    Left x -> (g, showColByX b x)
-    Right y -> (g, showRowByY b y)
+    Left x -> if isValidX g x then (g, showColByX b x) else (g, "Wrong coordinate x")
+    Right y -> if isValidY g y then (g, showRowByY b y) else (g, "Wrong coordinate y")
 
 handlePlace :: Game -> XY -> (Game, String)
 handlePlace g xy = do
