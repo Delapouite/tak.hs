@@ -23,6 +23,10 @@ data Stone = Stone Player StoneType
 instance Show Stone where
   show (Stone P1 F) = "F"
   show (Stone P2 F) = "f"
+  show (Stone P1 S) = "S"
+  show (Stone P2 S) = "s"
+  show (Stone P1 C) = "C"
+  show (Stone P2 C) = "c"
 
 -- bottom to top
 type Stack = [Stone]
@@ -96,6 +100,11 @@ argToXorY :: String -> Either X Y
 argToXorY arg = case isDigit $ head arg of
   False -> Left  (head arg)
   True  -> Right (read arg :: Int)
+
+argToStoneType :: String -> StoneType
+argToStoneType "f" = F
+argToStoneType "s" = S
+argToStoneType "c" = C
 
 toCols :: Board -> [Col]
 toCols b = chunksOf (getSize b) b
@@ -178,12 +187,11 @@ stackStone (x,y) stone c@(Cell cx cy stack) = if x == cx && y == cy
   then Cell cx cy (stack ++ [stone])
   else c
 
--- TODO
-placeStoneInGame :: Game -> XY -> (Game, String)
-placeStoneInGame g xy = (g', str)
+placeStoneInGame :: Game -> XY -> StoneType -> (Game, String)
+placeStoneInGame g xy st = (g', str)
   where
     b = board g
-    b' = placeStone b xy (Stone (getPlayer g) F)
+    b' = placeStone b xy (Stone (getPlayer g) st)
     g' = g { board = b', turn = (turn g) + 1 }
     str = showBoardWithAxes b'
 
@@ -196,17 +204,18 @@ handleShow g xory = do
     Left x -> if isValidX g x then (g, showColByX b x) else (g, "Wrong coordinate x")
     Right y -> if isValidY g y then (g, showRowByY b y) else (g, "Wrong coordinate y")
 
-handlePlace :: Game -> XY -> (Game, String)
-handlePlace g xy = do
+handlePlace :: Game -> XY -> StoneType-> (Game, String)
+handlePlace g xy st = do
   case isValidXY g xy of
-    True -> placeStoneInGame g xy
+    True -> placeStoneInGame g xy st
     False -> (g, "Wrong coordinates xy")
 
 handleAction :: Game -> Action -> (Game, String)
 handleAction g a = do
   case a of
     (Action "show" (coord:_)) -> handleShow g $ argToXorY coord
-    (Action "place" (coord:_)) -> handlePlace g $ argToXY coord
+    (Action "place" (coord:s:_)) -> handlePlace g (argToXY coord) (argToStoneType s)
+    (Action "place" (coord:_)) -> handlePlace g (argToXY coord) F
     _ -> (g, "Unknown action")
 
 loop :: Game -> IO ()
