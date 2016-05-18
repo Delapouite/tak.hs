@@ -69,7 +69,7 @@ getSize = truncate . sqrt . fromIntegral . length
 
 -- TODO
 getPlayer :: Game -> Player
-getPlayer g = P1
+getPlayer g = if (turn g) `mod` 2 == 0 then P2 else P1
 
 -- TODO
 isValidCoord :: Board -> Coord -> Bool
@@ -145,7 +145,7 @@ placeStoneInGame g coord = (g', str)
   where
     b = board g
     b' = placeStone b coord
-    g' = g { board = b' }
+    g' = g { board = b', turn = (turn g) + 1 }
     str = showBoardWithAxes b'
 
 -- IO
@@ -173,10 +173,16 @@ handleAction g a = do
 
 loop :: Game -> IO ()
 loop g = do
-  action <- prompt $ (show $ getPlayer g) ++ ">"
+  action <- prompt $ getPrompt g
   let tup = handleAction g $ parseAction action
   putStrLn $ snd tup
   loop $ fst tup
+
+getPrompt :: Game -> String
+getPrompt g = "turn " ++ t ++ " / " ++ p ++ ">"
+  where
+    t = show $ turn g
+    p = show $ getPlayer g
 
 prompt :: String -> IO String
 prompt q = do
