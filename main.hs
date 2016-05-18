@@ -6,7 +6,7 @@
 -- 1
 --  a b c
 
-import Data.Char (isDigit, ord)
+import Data.Char (isDigit, ord, toUpper)
 import Data.List (transpose)
 import Data.List.Split (chunksOf)
 import System.IO (hFlush, stdout)
@@ -93,13 +93,16 @@ isValidY g y = y > 0 && y <= size g
 isValidXY :: Game -> XY -> Bool
 isValidXY g (x,y) = isValidX g x && isValidY g y
 
-argToXY :: String -> XY
-argToXY (x:y) = (x, read y :: Int)
+toXY :: String -> XY
+toXY (x:y) = (x, read y :: Int)
 
-argToXorY :: String -> Either X Y
-argToXorY arg = case isDigit $ head arg of
+toXorY :: String -> Either X Y
+toXorY arg = case isDigit $ head arg of
   False -> Left  (head arg)
   True  -> Right (read arg :: Int)
+
+toStoneType :: String -> StoneType
+toStoneType arg = (read (map toUpper arg) :: StoneType)
 
 toCols :: Board -> [Col]
 toCols b = chunksOf (getSize b) b
@@ -208,9 +211,9 @@ handlePlace g xy st = do
 handleAction :: Game -> Action -> (Game, String)
 handleAction g a = do
   case a of
-    (Action "show" (coord:_)) -> handleShow g $ argToXorY coord
-    (Action "place" (coord:s:_)) -> handlePlace g (argToXY coord) (read s :: StoneType)
-    (Action "place" (coord:_)) -> handlePlace g (argToXY coord) F
+    (Action "show" (coord:_)) -> handleShow g $ toXorY coord
+    (Action "place" (coord:s:_)) -> handlePlace g (toXY coord) (toStoneType s)
+    (Action "place" (coord:_)) -> handlePlace g (toXY coord) F
     _ -> (g, "Unknown action")
 
 loop :: Game -> IO ()
