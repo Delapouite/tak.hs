@@ -34,9 +34,11 @@ instance Show Cell where
 type Board = [Cell]
 type Col = [Cell]
 type Row = [Cell]
+type X = Char
+type Y = Int
+type XY = (Char, Int)
 
 type Verb = String
-type Coord = String
 data Action = Action Verb [String]
 
 data Game = Game { size :: Int
@@ -72,8 +74,8 @@ getPlayer :: Game -> Player
 getPlayer g = if (turn g) `mod` 2 == 0 then P2 else P1
 
 -- TODO
-isValidCoord :: Board -> Coord -> Bool
-isValidCoord b c = True
+isValidXY :: Board -> XY -> Bool
+isValidXY b xy = True
 
 toCols :: Board -> [Col]
 toCols b = chunksOf (getSize b) b
@@ -90,13 +92,13 @@ showCells :: [Cell] -> String
 showCells = unwords . map show
 
 -- 97 = ASCII 'a'
-showColByX :: Board -> Char -> String
+showColByX :: Board -> X -> String
 showColByX b x = col ++ "\n" ++ showYAxis b
   where
     cols = toCols b
     col = showCells . reverse $ cols !! (ord x - 97)
 
-showRowByY :: Board -> Int -> String
+showRowByY :: Board -> Y -> String
 showRowByY b y = row ++ "\n" ++ showXAxis b
   where
     rows = toRows b
@@ -131,20 +133,27 @@ parseAction s = Action verb args
   where
     (verb:args) = words s
 
-placeStone :: Board -> Coord -> Board
-placeStone b coord = map (stackStone coord) b
+argToXY :: String -> XY
+argToXY arg = (x, y)
+  where
+    (f:s) = arg
+    x = f
+    y = read s :: Int
 
-stackStone :: Coord -> Cell -> Cell
-stackStone (x:y) c@(Cell cx cy _) = if x == cx && (read y :: Int) == cy
+placeStone :: Board -> XY -> Board
+placeStone b xy = map (stackStone xy) b
+
+stackStone :: XY -> Cell -> Cell
+stackStone (x,y) c@(Cell cx cy _) = if x == cx && y == cy
   then Cell cx cy [Stone P1 F]
   else c
 
 -- TODO
-placeStoneInGame :: Game -> Coord -> (Game, String)
-placeStoneInGame g coord = (g', str)
+placeStoneInGame :: Game -> XY -> (Game, String)
+placeStoneInGame g xy = (g', str)
   where
     b = board g
-    b' = placeStone b coord
+    b' = placeStone b xy
     g' = g { board = b', turn = (turn g) + 1 }
     str = showBoardWithAxes b'
 
@@ -157,18 +166,18 @@ handleShow g coord = do
     True  -> (g, showRowByY b $ read coord)
     False -> (g, showColByX b $ head coord)
 
-handlePlace :: Game -> Coord -> (Game, String)
-handlePlace g coord = do
+handlePlace :: Game -> XY -> (Game, String)
+handlePlace g xy = do
   let b = board g
-  case isValidCoord b coord of
-    True -> placeStoneInGame g coord 
+  case isValidXY b xy of
+    True -> placeStoneInGame g xy 
     False -> (g, "Wrong coordinates xy")
 
 handleAction :: Game -> Action -> (Game, String)
 handleAction g a = do
   case a of
-    (Action "show" (coord:cs)) -> handleShow g coord
-    (Action "place" (coord:cs)) -> handlePlace g coord
+    (Action "show" (coord:_)) -> handleShow g coord
+    (Action "place" (coord:_)) -> handlePlace g $ argToXY coord
     _ -> (g, "Unknown action")
 
 loop :: Game -> IO ()
