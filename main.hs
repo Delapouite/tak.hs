@@ -79,7 +79,7 @@ xToInt :: X -> Int
 xToInt x = ord x - 97
 
 isValidX :: Game -> X -> Bool
-isValidX g x = x' > 0 && x' <= size g
+isValidX g x = x' >= 0 && x' <= size g
   where
     x' = xToInt x
 
