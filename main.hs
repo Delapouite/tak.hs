@@ -16,7 +16,7 @@ import System.IO (hFlush, stdout)
 data Player = P1 | P2 deriving (Show)
 
 -- Flat, Standing or Cap
-data StoneType = F | S | C deriving (Show)
+data StoneType = F | S | C deriving (Show, Read)
 
 -- P1 in UpperCase, P2 in LowerCase
 data Stone = Stone Player StoneType
@@ -100,11 +100,6 @@ argToXorY :: String -> Either X Y
 argToXorY arg = case isDigit $ head arg of
   False -> Left  (head arg)
   True  -> Right (read arg :: Int)
-
-argToStoneType :: String -> StoneType
-argToStoneType "f" = F
-argToStoneType "s" = S
-argToStoneType "c" = C
 
 toCols :: Board -> [Col]
 toCols b = chunksOf (getSize b) b
@@ -214,7 +209,7 @@ handleAction :: Game -> Action -> (Game, String)
 handleAction g a = do
   case a of
     (Action "show" (coord:_)) -> handleShow g $ argToXorY coord
-    (Action "place" (coord:s:_)) -> handlePlace g (argToXY coord) (argToStoneType s)
+    (Action "place" (coord:s:_)) -> handlePlace g (argToXY coord) (read s :: StoneType)
     (Action "place" (coord:_)) -> handlePlace g (argToXY coord) F
     _ -> (g, "Unknown action")
 
