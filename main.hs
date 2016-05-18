@@ -103,6 +103,11 @@ toCols b = chunksOf (getSize b) b
 toRows :: Board -> [Row]
 toRows = transpose . toCols
 
+getTallerStackHeight :: [Cell] -> Int
+getTallerStackHeight cells = maximum $ map getStackHeight cells
+  where
+    getStackHeight (Cell _ _ stack) = length stack
+
 -- display
 
 showBoard :: Board -> String
@@ -111,17 +116,34 @@ showBoard = unlines . reverse . map showCells . toRows
 showCells :: [Cell] -> String
 showCells = unwords . map show
 
+showStack :: Stack -> String
+showStack [] = "."
+showStack s = show $ last s
+
+showStackLevel :: [Cell] -> Int -> String
+showStackLevel cs i = unwords stones
+  where
+    stones = map getStone cs
+    getStone (Cell _ _ stack) = if (not $ null stack) && (length stack - 1 >= i)
+      then show $ stack !! i
+      else " "
+
+showStacks :: [Cell] -> String
+showStacks cs = unlines $ map (showStackLevel cs) levels
+  where
+    levels = reverse [0..(getTallerStackHeight cs) - 1]
+
 showColByX :: Board -> X -> String
-showColByX b x = col ++ "\n" ++ showYAxis b
+showColByX b x = col ++ showYAxis b
   where
     cols = toCols b
-    col = showCells . reverse $ cols !! (xToInt x)
+    col = showStacks . reverse $ cols !! (xToInt x)
 
 showRowByY :: Board -> Y -> String
-showRowByY b y = row ++ "\n" ++ showXAxis b
+showRowByY b y = row ++ showXAxis b
   where
     rows = toRows b
-    row = showCells $ rows !! (y - 1)
+    row = showStacks $ rows !! (y - 1)
 
 showBoardWithYAxis :: Board -> String
 showBoardWithYAxis = unlines . reverse . map showRowWithY . toRows
@@ -140,10 +162,6 @@ showYAxis b = unwords $ map show $ reverse $ take (getSize b) [1..]
 
 showXAxis :: Board -> String
 showXAxis b = unwords $ map (\x -> x : []) $ take (getSize b) xs
-
-showStack :: Stack -> String
-showStack [] = "."
-showStack s = show $ last s
 
 -- actions
 
@@ -181,7 +199,7 @@ handleShow g xory = do
 handlePlace :: Game -> XY -> (Game, String)
 handlePlace g xy = do
   case isValidXY g xy of
-    True -> placeStoneInGame g xy 
+    True -> placeStoneInGame g xy
     False -> (g, "Wrong coordinates xy")
 
 handleAction :: Game -> Action -> (Game, String)
