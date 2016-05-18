@@ -39,6 +39,11 @@ type Verb = String
 type Coord = String
 data Action = Action Verb [String]
 
+data Game = Game { size :: Int
+                 , board :: Board
+                 , turn :: Int
+                 }
+
 -- axis
 xs = ['a'..]
 
@@ -61,6 +66,10 @@ capCount _ = 1
 
 getSize :: Board -> Int
 getSize = truncate . sqrt . fromIntegral . length
+
+-- TODO
+getPlayer :: Game -> Player
+getPlayer g = P1
 
 -- TODO
 isValidCoord :: Board -> Coord -> Bool
@@ -130,33 +139,44 @@ stackStone (x:y) c@(Cell cx cy _) = if x == cx && (read y :: Int) == cy
   then Cell cx cy [Stone P1 F]
   else c
 
+-- TODO
+placeStoneInGame :: Game -> Coord -> (Game, String)
+placeStoneInGame g coord = (g', str)
+  where
+    b = board g
+    b' = placeStone b coord
+    g' = g { board = b' }
+    str = showBoardWithAxes b'
+
 -- IO
 
-handleShow :: Board -> String -> (Board, String)
-handleShow b coord = do
+handleShow :: Game -> String -> (Game, String)
+handleShow g coord = do
+  let b = board g
   case isDigit $ head coord of
-    True  -> (b, showRowByY b $ read coord)
-    False -> (b, showColByX b $ head coord)
+    True  -> (g, showRowByY b $ read coord)
+    False -> (g, showColByX b $ head coord)
 
-handlePlace :: Board -> Coord -> (Board, String)
-handlePlace b coord = do
+handlePlace :: Game -> Coord -> (Game, String)
+handlePlace g coord = do
+  let b = board g
   case isValidCoord b coord of
-    True -> (placeStone b coord, showBoardWithAxes $ placeStone b coord)
-    False -> (b, "Wrong coordinates xy")
+    True -> placeStoneInGame g coord 
+    False -> (g, "Wrong coordinates xy")
 
-handleAction :: Board -> Action -> (Board, String)
-handleAction b a = do
+handleAction :: Game -> Action -> (Game, String)
+handleAction g a = do
   case a of
-    (Action "show" (coord:cs)) -> handleShow b coord
-    (Action "place" (coord:cs)) -> handlePlace b coord
-    _ -> (b, "Unknown action")
+    (Action "show" (coord:cs)) -> handleShow g coord
+    (Action "place" (coord:cs)) -> handlePlace g coord
+    _ -> (g, "Unknown action")
 
-loop :: Board -> Player -> IO ()
-loop b p = do
-  action <- prompt $ show p ++ ">"
-  let tup = handleAction b $ parseAction action
+loop :: Game -> IO ()
+loop g = do
+  action <- prompt $ (show $ getPlayer g) ++ ">"
+  let tup = handleAction g $ parseAction action
   putStrLn $ snd tup
-  loop (fst tup) p
+  loop $ fst tup
 
 prompt :: String -> IO String
 prompt q = do
@@ -166,9 +186,14 @@ prompt q = do
   a <- getLine
   return a
 
+promptInt q = do
+  a <- prompt q
+  return (read a :: Int)
+
 main = do
   putStrLn "Welcome to Tak.hs"
-  size <- prompt "Size of the board? [3..8]"
-  let b = initBoard (read size :: Int)
+  size <- promptInt "Size of the board? [3..8]"
+  let b = initBoard size
+  let g = Game { size=size, board=b, turn=1 }
   putStrLn $ showBoardWithAxes b
-  loop b P1
+  loop g
