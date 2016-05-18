@@ -66,15 +66,17 @@ capCount 4 = 0
 capCount 3 = 0
 capCount _ = 1
 
--- 97 = ASCII 'a'
-xToInt :: X -> Int
-xToInt x = ord x - 97
-
 getSize :: Board -> Int
 getSize = truncate . sqrt . fromIntegral . length
 
 getPlayer :: Game -> Player
 getPlayer g = if (turn g) `mod` 2 == 0 then P2 else P1
+
+-- XY
+
+-- 97 = ASCII 'a'
+xToInt :: X -> Int
+xToInt x = ord x - 97
 
 isValidX :: Game -> X -> Bool
 isValidX g x = x' > 0 && x' <= size g
@@ -86,6 +88,14 @@ isValidY g y = y > 0 && y <= size g
 
 isValidXY :: Game -> XY -> Bool
 isValidXY g (x,y) = isValidX g x && isValidY g y
+
+argToXY :: String -> XY
+argToXY (x:y) = (x, read y :: Int)
+
+argToXorY :: String -> Either X Y
+argToXorY arg = case isDigit $ head arg of
+  False -> Left  (head arg)
+  True  -> Right (read arg :: Int)
 
 toCols :: Board -> [Col]
 toCols b = chunksOf (getSize b) b
@@ -142,20 +152,12 @@ parseAction s = Action verb args
   where
     (verb:args) = words s
 
-argToXY :: String -> XY
-argToXY (x:y) = (x, read y :: Int)
+placeStone :: Board -> XY -> Stone -> Board
+placeStone b xy s = map (stackStone xy s) b
 
-argToXorY :: String -> Either X Y
-argToXorY arg = case isDigit $ head arg of
-  False -> Left  (head arg)
-  True  -> Right (read arg :: Int)
-
-placeStone :: Board -> XY -> Board
-placeStone b xy = map (stackStone xy) b
-
-stackStone :: XY -> Cell -> Cell
-stackStone (x,y) c@(Cell cx cy _) = if x == cx && y == cy
-  then Cell cx cy [Stone P1 F]
+stackStone :: XY -> Stone -> Cell -> Cell
+stackStone (x,y) stone c@(Cell cx cy stack) = if x == cx && y == cy
+  then Cell cx cy (stack ++ [stone])
   else c
 
 -- TODO
@@ -163,7 +165,7 @@ placeStoneInGame :: Game -> XY -> (Game, String)
 placeStoneInGame g xy = (g', str)
   where
     b = board g
-    b' = placeStone b xy
+    b' = placeStone b xy (Stone (getPlayer g) F)
     g' = g { board = b', turn = (turn g) + 1 }
     str = showBoardWithAxes b'
 
