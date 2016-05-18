@@ -140,6 +140,11 @@ argToXY arg = (x, y)
     x = f
     y = read s :: Int
 
+argToXorY :: String -> Either X Y
+argToXorY arg = case isDigit $ head arg of
+  False -> Left  (head arg)
+  True  -> Right (read arg :: Int)
+
 placeStone :: Board -> XY -> Board
 placeStone b xy = map (stackStone xy) b
 
@@ -159,12 +164,12 @@ placeStoneInGame g xy = (g', str)
 
 -- IO
 
-handleShow :: Game -> String -> (Game, String)
-handleShow g coord = do
+handleShow :: Game -> Either X Y -> (Game, String)
+handleShow g xory = do
   let b = board g
-  case isDigit $ head coord of
-    True  -> (g, showRowByY b $ read coord)
-    False -> (g, showColByX b $ head coord)
+  case xory of
+    Left x -> (g, showColByX b x)
+    Right y -> (g, showRowByY b y)
 
 handlePlace :: Game -> XY -> (Game, String)
 handlePlace g xy = do
@@ -176,7 +181,7 @@ handlePlace g xy = do
 handleAction :: Game -> Action -> (Game, String)
 handleAction g a = do
   case a of
-    (Action "show" (coord:_)) -> handleShow g coord
+    (Action "show" (coord:_)) -> handleShow g $ argToXorY coord
     (Action "place" (coord:_)) -> handlePlace g $ argToXY coord
     _ -> (g, "Unknown action")
 
