@@ -66,16 +66,26 @@ capCount 4 = 0
 capCount 3 = 0
 capCount _ = 1
 
+-- 97 = ASCII 'a'
+xToInt :: X -> Int
+xToInt x = ord x - 97
+
 getSize :: Board -> Int
 getSize = truncate . sqrt . fromIntegral . length
 
--- TODO
 getPlayer :: Game -> Player
 getPlayer g = if (turn g) `mod` 2 == 0 then P2 else P1
 
--- TODO
-isValidXY :: Board -> XY -> Bool
-isValidXY b xy = True
+isValidX :: Game -> X -> Bool
+isValidX g x = x' > 0 && x' <= size g
+  where
+    x' = xToInt x
+
+isValidY :: Game -> Y -> Bool
+isValidY g y = y > 0 && y <= size g
+
+isValidXY :: Game -> XY -> Bool
+isValidXY g (x,y) = isValidX g x && isValidY g y
 
 toCols :: Board -> [Col]
 toCols b = chunksOf (getSize b) b
@@ -91,12 +101,11 @@ showBoard = unlines . reverse . map showCells . toRows
 showCells :: [Cell] -> String
 showCells = unwords . map show
 
--- 97 = ASCII 'a'
 showColByX :: Board -> X -> String
 showColByX b x = col ++ "\n" ++ showYAxis b
   where
     cols = toCols b
-    col = showCells . reverse $ cols !! (ord x - 97)
+    col = showCells . reverse $ cols !! (xToInt x)
 
 showRowByY :: Board -> Y -> String
 showRowByY b y = row ++ "\n" ++ showXAxis b
@@ -173,8 +182,7 @@ handleShow g xory = do
 
 handlePlace :: Game -> XY -> (Game, String)
 handlePlace g xy = do
-  let b = board g
-  case isValidXY b xy of
+  case isValidXY g xy of
     True -> placeStoneInGame g xy 
     False -> (g, "Wrong coordinates xy")
 
