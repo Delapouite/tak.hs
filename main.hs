@@ -13,7 +13,7 @@ import System.IO (hFlush, stdout)
 
 -- types
 
-data Player = P1 | P2 deriving (Show)
+data Player = P1 | P2 deriving (Eq, Show)
 
 -- Flat, Standing or Cap
 data StoneType = F | S | C deriving (Show, Read)
@@ -75,6 +75,17 @@ getSize = truncate . sqrt . fromIntegral . length
 
 getPlayer :: Game -> Player
 getPlayer g = if (turn g) `mod` 2 == 0 then P2 else P1
+
+getPlacedStonesByPlayer :: Game -> Player -> [Stone]
+getPlacedStonesByPlayer g p = concatMap getOwnStones stacks
+  where
+    stacks = map getStack $ board g
+    getStack (Cell _ _ s) = s
+    getOwnStones stack = filter ownStones stack
+    ownStones (Stone owner _ ) = owner == p
+
+getPlacedStones :: Game -> [Stone]
+getPlacedStones g = getPlacedStonesByPlayer g P1 ++ getPlacedStonesByPlayer g P2
 
 -- XY
 
@@ -170,6 +181,16 @@ showYAxis b = unwords $ map show $ reverse $ take (getSize b) [1..]
 showXAxis :: Board -> String
 showXAxis b = unwords $ map (\x -> x : []) $ take (getSize b) xs
 
+showDecks :: Game -> String
+showDecks g = "Stones left P1: " ++ p1 ++ " - P2: " ++ p2
+  where
+    total = stoneCount $ size g
+    p1 = show $ total - length (getPlacedStonesByPlayer g P1)
+    p2 = show $ total - length (getPlacedStonesByPlayer g P2)
+
+showGame :: Game -> String
+showGame g = showDecks g ++ "\n" ++ (showBoardWithAxes $ board g)
+
 -- actions
 
 parseAction :: String -> Action
@@ -212,6 +233,7 @@ handleAction :: Game -> Action -> (Game, String)
 handleAction g a = do
   case a of
     (Action "show" (coord:_)) -> handleShow g $ toXorY coord
+    (Action "show" _) -> (g, showGame g)
     (Action "place" (coord:s:_)) -> handlePlace g (toXY coord) (toStoneType s)
     (Action "place" (coord:_)) -> handlePlace g (toXY coord) F
     _ -> (g, "Unknown action")
@@ -244,7 +266,6 @@ promptInt q = do
 main = do
   putStrLn "Welcome to Tak.hs"
   size <- promptInt "Size of the board? [3..8]"
-  let b = initBoard size
-  let g = Game { size=size, board=b, turn=1 }
-  putStrLn $ showBoardWithAxes b
+  let g = Game { size=size, board=(initBoard size), turn=1 }
+  putStrLn $ showGame g
   loop g
