@@ -7,7 +7,7 @@
 --  a b c
 
 import Data.Char (isDigit, ord, toUpper)
-import Data.List (transpose)
+import Data.List (find, transpose)
 import Data.List.Split (chunksOf)
 import System.IO (hFlush, stdout)
 
@@ -89,6 +89,9 @@ getPlacedStones g = getPlacedStonesByPlayer g P1 ++ getPlacedStonesByPlayer g P2
 
 -- XY
 
+getCell :: Board -> XY -> Maybe Cell
+getCell b (x,y) = find (\(Cell cx cy _) -> cx == x && cy == y) b
+
 -- 97 = ASCII 'a'
 xToInt :: X -> Int
 xToInt x = ord x - 97
@@ -103,6 +106,15 @@ isValidY g y = y > 0 && y <= size g
 
 isValidXY :: Game -> XY -> Bool
 isValidXY g (x,y) = isValidX g x && isValidY g y
+
+canPlace :: Game -> XY -> Bool
+canPlace g xy = isValid && isStackEmpty
+  where
+    isValid = isValidXY g xy
+    cell = getCell (board g) xy
+    isStackEmpty = case cell of
+      Just (Cell _ _ stack) -> null stack
+      Nothing -> False
 
 toXY :: String -> XY
 toXY (x:y) = (x, read y :: Int)
@@ -225,7 +237,7 @@ handleShow g xory = do
 
 handlePlace :: Game -> XY -> StoneType-> (Game, String)
 handlePlace g xy st = do
-  case isValidXY g xy of
+  case canPlace g xy of
     True -> placeStoneInGame g xy st
     False -> (g, "Wrong coordinates xy")
 
