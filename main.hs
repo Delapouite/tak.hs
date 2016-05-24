@@ -51,6 +51,9 @@ data Game = Game { size :: Int
                  , turn :: Int
                  }
 
+minSize = 3
+maxSize = 8
+
 -- axis
 xs = ['a'..]
 
@@ -107,6 +110,9 @@ isValidY g y = y > 0 && y <= size g
 
 isValidXY :: Game -> XY -> Bool
 isValidXY g (x,y) = isValidX g x && isValidY g y
+
+isValidSize :: Int -> Bool
+isValidSize s = s >= minSize && s <= maxSize
 
 canPlace :: Game -> XY -> Bool
 canPlace g xy = isValid && isStackEmpty
@@ -237,10 +243,9 @@ handleShow g xory = do
     Right y -> if isValidY g y then (g, showRowByY b y) else (g, "Wrong coordinate y")
 
 handlePlace :: Game -> XY -> StoneType-> (Game, String)
-handlePlace g xy st = do
-  case canPlace g xy of
-    True -> placeStoneInGame g xy st
-    False -> (g, "Wrong coordinates xy")
+handlePlace g xy st
+  | canPlace g xy = do placeStoneInGame g xy st
+  | otherwise     = do (g, "Wrong coordinates xy")
 
 handleAction :: Game -> Action -> (Game, String)
 handleAction g a = do
@@ -279,9 +284,9 @@ promptInt q = do
 
 promptSize :: IO Int
 promptSize = do
-  size <- promptInt "Size of the board? [3..8]"
+  size <- promptInt $ "Size of the board? [" ++ (show minSize) ++ ".." ++ (show maxSize) ++ "]"
   case size of
-    Just s -> return s
+    Just s -> if isValidSize s then return s else promptSize
     Nothing -> promptSize
 
 main = do
