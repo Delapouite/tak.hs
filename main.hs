@@ -114,10 +114,9 @@ isValidXY g (x,y) = isValidX g x && isValidY g y
 isValidSize :: Int -> Bool
 isValidSize s = s >= minSize && s <= maxSize
 
-canPlace :: Game -> XY -> Bool
-canPlace g xy = isValid && isStackEmpty
+canStack :: Game -> XY -> Bool
+canStack g xy = isStackEmpty
   where
-    isValid = isValidXY g xy
     cell = getCell (board g) xy
     isStackEmpty = case cell of
       Just (Cell _ _ stack) -> null stack
@@ -244,8 +243,9 @@ handleShow g xory = case xory of
 
 handlePlace :: Game -> XY -> StoneType -> (Game, String)
 handlePlace g xy st
-  | canPlace g xy = placeStoneInGame g xy st
-  | otherwise     = (g, "Wrong coordinates xy")
+  | not $ isValidXY g xy = (g, "Wrong coordinates xy")
+  | not $ canStack g xy  = (g, "The cell is not empty")
+  | otherwise            = placeStoneInGame g xy st
 
 handleAction :: Game -> Action -> (Game, String)
 handleAction g a = case a of
