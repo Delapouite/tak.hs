@@ -17,7 +17,7 @@ import Text.Read (readMaybe)
 data Player = P1 | P2 deriving (Eq, Show)
 
 -- Flat, Standing or Cap
-data StoneType = F | S | C deriving (Show, Read)
+data StoneType = F | S | C deriving (Eq, Show, Read)
 
 -- P1 in UpperCase, P2 in LowerCase
 data Stone = Stone Player StoneType
@@ -80,13 +80,16 @@ getSize = truncate . sqrt . fromIntegral . length
 getPlayer :: Game -> Player
 getPlayer g = if turn g `mod` 2 == 0 then P2 else P1
 
-getPlacedStonesByPlayer :: Game -> Player -> [Stone]
-getPlacedStonesByPlayer g p = concatMap getOwnStones $ getStacks g
+getPlacedByPlayer :: Game -> Player -> [Stone]
+getPlacedByPlayer g p = concatMap getOwnStones $ getStacks g
   where
     getOwnStones = filter (\(Stone owner _) -> owner == p)
 
-getPlacedStones :: Game -> [Stone]
-getPlacedStones g = getPlacedStonesByPlayer g P1 ++ getPlacedStonesByPlayer g P2
+getPlaced :: Game -> [Stone]
+getPlaced g = getPlacedByPlayer g P1 ++ getPlacedByPlayer g P2
+
+getPlacedByPlayerAndType :: Game -> Player -> StoneType -> [Stone]
+getPlacedByPlayerAndType g p st = filter (\(Stone _ t) -> t == st) $ getPlacedByPlayer g p
 
 -- XY
 
@@ -185,7 +188,7 @@ showBoardWithYAxis :: Board -> String
 showBoardWithYAxis = unlines . reverse . map showRowWithY . toRows
 
 showBoardWithAxes :: Board -> String
-showBoardWithAxes b = showBoardWithYAxis b ++ "  " ++ showXAxis b
+showBoardWithAxes b = "\n" ++ showBoardWithYAxis b ++ "  " ++ showXAxis b
 
 showRowWithY :: Row -> String
 showRowWithY r = show y ++ " " ++ showCells r
@@ -199,15 +202,21 @@ showYAxis b = unwords $ map show $ reverse $ take (getSize b) [1..]
 showXAxis :: Board -> String
 showXAxis b = unwords $ map (: []) $ take (getSize b) xs
 
-showDecks :: Game -> String
-showDecks g = "Stones left P1: " ++ p1 ++ " - P2: " ++ p2
+showDeck :: Game -> Player -> String
+showDeck g p = show p ++ "'s deck: " ++ flats ++ " " ++ caps ++ "\n"
   where
     total = stoneCount $ size g
-    p1 = show $ total - length (getPlacedStonesByPlayer g P1)
-    p2 = show $ total - length (getPlacedStonesByPlayer g P2)
+    totalCaps = capCount $ size g
+    placedCaps = length $ getPlacedByPlayerAndType g p C
+    placed = length (getPlacedByPlayer g p) - placedCaps
+    flats = show (total - placed)
+    caps = show (totalCaps - placedCaps) ++ show (Stone p C)
+
+showDecks :: Game -> String
+showDecks g = "\n" ++ showDeck g P1 ++ showDeck g P2
 
 showGame :: Game -> String
-showGame g = showDecks g ++ "\n" ++ showBoardWithAxes (board g)
+showGame g = showDecks g ++ showBoardWithAxes (board g)
 
 -- actions
 
@@ -263,7 +272,7 @@ loop g = do
   loop $ fst tup
 
 getPrompt :: Game -> String
-getPrompt g = "turn " ++ t ++ " / " ++ p ++ ">"
+getPrompt g = "\nturn " ++ t ++ " / " ++ p ++ ">"
   where
     t = show $ turn g
     p = show $ getPlayer g
