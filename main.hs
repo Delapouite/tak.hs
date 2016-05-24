@@ -81,12 +81,9 @@ getPlayer :: Game -> Player
 getPlayer g = if turn g `mod` 2 == 0 then P2 else P1
 
 getPlacedStonesByPlayer :: Game -> Player -> [Stone]
-getPlacedStonesByPlayer g p = concatMap getOwnStones stacks
+getPlacedStonesByPlayer g p = concatMap getOwnStones $ getStacks g
   where
-    stacks = map getStack $ board g
-    getStack (Cell _ _ s) = s
-    getOwnStones = filter ownStones
-    ownStones (Stone owner _ ) = owner == p
+    getOwnStones = filter (\(Stone owner _) -> owner == p)
 
 getPlacedStones :: Game -> [Stone]
 getPlacedStones g = getPlacedStonesByPlayer g P1 ++ getPlacedStonesByPlayer g P2
@@ -95,6 +92,9 @@ getPlacedStones g = getPlacedStonesByPlayer g P1 ++ getPlacedStonesByPlayer g P2
 
 getCell :: Board -> XY -> Maybe Cell
 getCell b (x,y) = find (\(Cell cx cy _) -> cx == x && cy == y) b
+
+getStacks :: Game -> [Stack]
+getStacks g = map (\(Cell _ _ s) -> s) $ board g
 
 -- 97 = ASCII 'a'
 xToInt :: X -> Int
