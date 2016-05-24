@@ -10,6 +10,7 @@ import Data.Char (isDigit, ord, toUpper)
 import Data.List (find, transpose)
 import Data.List.Split (chunksOf)
 import System.IO (hFlush, stdout)
+import Text.Read (readMaybe)
 
 -- types
 
@@ -271,13 +272,21 @@ prompt q = do
   a <- getLine
   return a
 
+promptInt :: String -> IO (Maybe Int)
 promptInt q = do
   a <- prompt q
-  return (read a :: Int)
+  return (readMaybe a :: Maybe Int)
+
+promptSize :: IO Int
+promptSize = do
+  size <- promptInt "Size of the board? [3..8]"
+  case size of
+    Just s -> return s
+    Nothing -> promptSize
 
 main = do
   putStrLn "Welcome to Tak.hs"
-  size <- promptInt "Size of the board? [3..8]"
+  size <- promptSize
   let g = Game { size=size, board=(initBoard size), turn=1 }
   putStrLn $ showGame g
   loop g
