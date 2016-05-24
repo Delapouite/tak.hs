@@ -78,14 +78,14 @@ getSize :: Board -> Int
 getSize = truncate . sqrt . fromIntegral . length
 
 getPlayer :: Game -> Player
-getPlayer g = if (turn g) `mod` 2 == 0 then P2 else P1
+getPlayer g = if turn g `mod` 2 == 0 then P2 else P1
 
 getPlacedStonesByPlayer :: Game -> Player -> [Stone]
 getPlacedStonesByPlayer g p = concatMap getOwnStones stacks
   where
     stacks = map getStack $ board g
     getStack (Cell _ _ s) = s
-    getOwnStones stack = filter ownStones stack
+    getOwnStones = filter ownStones
     ownStones (Stone owner _ ) = owner == p
 
 getPlacedStones :: Game -> [Stone]
@@ -127,12 +127,12 @@ toXY :: String -> XY
 toXY (x:y) = (x, read y :: Int)
 
 toXorY :: String -> Either X Y
-toXorY arg = case isDigit $ head arg of
-  False -> Left  (head arg)
-  True  -> Right (read arg :: Int)
+toXorY arg = if isDigit $ head arg
+  then Right (read arg :: Int)
+  else Left  (head arg)
 
 toStoneType :: String -> StoneType
-toStoneType arg = (read (map toUpper arg) :: StoneType)
+toStoneType arg = read (map toUpper arg) :: StoneType
 
 toCols :: Board -> [Col]
 toCols b = chunksOf (getSize b) b
@@ -161,20 +161,20 @@ showStackLevel :: [Cell] -> Int -> String
 showStackLevel cs i = unwords stones
   where
     stones = map getStone cs
-    getStone (Cell _ _ stack) = if (not $ null stack) && (length stack - 1 >= i)
+    getStone (Cell _ _ stack) = if not (null stack) && (length stack - 1 >= i)
       then show $ stack !! i
       else " "
 
 showStacks :: [Cell] -> String
 showStacks cs = unlines $ map (showStackLevel cs) levels
   where
-    levels = reverse [0..(getTallerStackHeight cs) - 1]
+    levels = reverse [0..getTallerStackHeight cs - 1]
 
 showColByX :: Board -> X -> String
 showColByX b x = col ++ showYAxis b
   where
     cols = toCols b
-    col = showStacks . reverse $ cols !! (xToInt x)
+    col = showStacks . reverse $ cols !! xToInt x
 
 showRowByY :: Board -> Y -> String
 showRowByY b y = row ++ showXAxis b
@@ -189,7 +189,7 @@ showBoardWithAxes :: Board -> String
 showBoardWithAxes b = showBoardWithYAxis b ++ "  " ++ showXAxis b
 
 showRowWithY :: Row -> String
-showRowWithY r = (show y) ++ " " ++ showCells r
+showRowWithY r = show y ++ " " ++ showCells r
   where
     (Cell _ y _) = head r
 
@@ -198,7 +198,7 @@ showYAxis :: Board -> String
 showYAxis b = unwords $ map show $ reverse $ take (getSize b) [1..]
 
 showXAxis :: Board -> String
-showXAxis b = unwords $ map (\x -> x : []) $ take (getSize b) xs
+showXAxis b = unwords $ map (: []) $ take (getSize b) xs
 
 showDecks :: Game -> String
 showDecks g = "Stones left P1: " ++ p1 ++ " - P2: " ++ p2
@@ -208,7 +208,7 @@ showDecks g = "Stones left P1: " ++ p1 ++ " - P2: " ++ p2
     p2 = show $ total - length (getPlacedStonesByPlayer g P2)
 
 showGame :: Game -> String
-showGame g = showDecks g ++ "\n" ++ (showBoardWithAxes $ board g)
+showGame g = showDecks g ++ "\n" ++ showBoardWithAxes (board g)
 
 -- actions
 
@@ -230,26 +230,25 @@ placeStoneInGame g xy st = (g', str)
   where
     b = board g
     b' = placeStone b xy (Stone (getPlayer g) st)
-    g' = g { board = b', turn = (turn g) + 1 }
+    g' = g { board = b', turn = turn g + 1 }
     str = showBoardWithAxes b'
 
 -- IO
 
 handleShow :: Game -> Either X Y -> (Game, String)
-handleShow g xory = do
-  let b = board g
-  case xory of
+handleShow g xory = case xory of
     Left x -> if isValidX g x then (g, showColByX b x) else (g, "Wrong coordinate x")
     Right y -> if isValidY g y then (g, showRowByY b y) else (g, "Wrong coordinate y")
+  where
+    b = board g
 
-handlePlace :: Game -> XY -> StoneType-> (Game, String)
+handlePlace :: Game -> XY -> StoneType -> (Game, String)
 handlePlace g xy st
-  | canPlace g xy = do placeStoneInGame g xy st
-  | otherwise     = do (g, "Wrong coordinates xy")
+  | canPlace g xy = placeStoneInGame g xy st
+  | otherwise     = (g, "Wrong coordinates xy")
 
 handleAction :: Game -> Action -> (Game, String)
-handleAction g a = do
-  case a of
+handleAction g a = case a of
     (Action "show" (coord:_)) -> handleShow g $ toXorY coord
     (Action "show" _) -> (g, showGame g)
     (Action "place" (coord:s:_)) -> handlePlace g (toXY coord) (toStoneType s)
@@ -274,8 +273,7 @@ prompt q = do
   putStr $ q ++ " "
   -- http://stackoverflow.com/questions/21853343/haskell-putstr-vs-putstrln-and-instruction-order
   hFlush stdout
-  a <- getLine
-  return a
+  getLine
 
 promptInt :: String -> IO (Maybe Int)
 promptInt q = do
@@ -284,7 +282,7 @@ promptInt q = do
 
 promptSize :: IO Int
 promptSize = do
-  size <- promptInt $ "Size of the board? [" ++ (show minSize) ++ ".." ++ (show maxSize) ++ "]"
+  size <- promptInt $ "Size of the board? [" ++ show minSize ++ ".." ++ show maxSize ++ "]"
   case size of
     Just s -> if isValidSize s then return s else promptSize
     Nothing -> promptSize
@@ -292,6 +290,6 @@ promptSize = do
 main = do
   putStrLn "Welcome to Tak.hs"
   size <- promptSize
-  let g = Game { size=size, board=(initBoard size), turn=1 }
+  let g = Game { size = size, board = initBoard size, turn = 1 }
   putStrLn $ showGame g
   loop g
