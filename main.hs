@@ -6,7 +6,12 @@
 -- 1
 --  a b c
 
-import Data.Char (isDigit, ord, toUpper)
+-- PTN
+-- Place flat stone at a1: a1
+-- Place capstone at b4: Cb4
+-- Place standing stone at d3: Sd3
+
+import Data.Char (isAlpha, isDigit, ord, toLower, toUpper)
 import Data.List (find, transpose)
 import Data.List.Split (chunksOf)
 import System.IO (hFlush, stdout)
@@ -41,7 +46,7 @@ type Col = [Cell]
 type Row = [Cell]
 type X = Char
 type Y = Int
-type XY = (Char, Int)
+type XY = (X, Y)
 
 type Verb = String
 data Action = Action Verb [String]
@@ -124,9 +129,6 @@ canStack g xy = isStackEmpty
     isStackEmpty = case cell of
       Just (Cell _ _ stack) -> null stack
       Nothing -> False
-
-toXY :: String -> XY
-toXY (x:y) = (x, read y :: Int)
 
 toXorY :: String -> Either X Y
 toXorY arg = if isDigit $ head arg
@@ -225,6 +227,21 @@ parseAction s = Action verb args
   where
     (verb:args) = words s
 
+parseXY :: String -> Maybe XY
+parseXY (x:y:[]) = if isAlpha x && isDigit y then Just (toLower x, read [y]) else Nothing
+parseXY _ = Nothing
+
+-- PTN: (stone)(square)
+parsePlace :: String -> Maybe (StoneType, XY)
+parsePlace (st:x:y:[]) = case readMaybe [toUpper st] of
+  Just s -> case parseXY [x, y] of
+    Just xy -> Just (s, xy)
+    _ -> Nothing
+  _ -> Nothing
+parsePlace xy = case parseXY xy of
+  Just xy -> Just (F, xy)
+  _ -> Nothing
+
 placeStone :: Board -> XY -> Stone -> Board
 placeStone b xy s = map (stackStone xy s) b
 
@@ -245,23 +262,24 @@ placeStoneInGame g xy st = (g', str)
 
 handleShow :: Game -> Either X Y -> (Game, String)
 handleShow g xory = case xory of
-    Left x -> if isValidX g x then (g, showColByX b x) else (g, "Wrong coordinate x")
-    Right y -> if isValidY g y then (g, showRowByY b y) else (g, "Wrong coordinate y")
+    Left x -> if isValidX g x then (g, showColByX b x) else (g, "Wrong x coordinate")
+    Right y -> if isValidY g y then (g, showRowByY b y) else (g, "Wrong y coordinate")
   where
     b = board g
 
 handlePlace :: Game -> XY -> StoneType -> (Game, String)
 handlePlace g xy st
-  | not $ isValidXY g xy = (g, "Wrong coordinates xy")
-  | not $ canStack g xy  = (g, "The cell is not empty")
+  | not $ isValidXY g xy = (g, "Wrong xy coordinates")
+  | not $ canStack g xy  = (g, "The cell must be empty")
   | otherwise            = placeStoneInGame g xy st
 
 handleAction :: Game -> Action -> (Game, String)
 handleAction g a = case a of
     (Action "show" (coord:_)) -> handleShow g $ toXorY coord
     (Action "show" _) -> (g, showGame g)
-    (Action "place" (coord:s:_)) -> handlePlace g (toXY coord) (toStoneType s)
-    (Action "place" (coord:_)) -> handlePlace g (toXY coord) F
+    (Action "place" (args:_)) -> case parsePlace args of
+      Just (st, xy) -> handlePlace g xy st
+      _ -> (g, "Wrong stone type or xy coordinates")
     _ -> (g, "Unknown action")
 
 loop :: Game -> IO ()
