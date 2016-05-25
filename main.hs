@@ -130,6 +130,13 @@ canStack g xy = isStackEmpty
       Just (Cell _ _ stack) -> null stack
       Nothing -> False
 
+capsInDeck :: Game -> Bool
+capsInDeck g = totalCaps - placedCaps > 0
+  where
+    p = getPlayer g
+    totalCaps = capCount $ size g
+    placedCaps = length $ getPlacedByPlayerAndType g p C
+
 toXorY :: String -> Either X Y
 toXorY arg = if isDigit $ head arg
   then Right (read [head arg] :: Int)
@@ -269,9 +276,10 @@ handleShow g xory = case xory of
 
 handlePlace :: Game -> XY -> StoneType -> (Game, String)
 handlePlace g xy st
-  | not $ isValidXY g xy = (g, "Wrong xy coordinates")
-  | not $ canStack g xy  = (g, "The cell must be empty")
-  | otherwise            = placeStoneInGame g xy st
+  | not $ isValidXY g xy          = (g, "Wrong xy coordinates")
+  | not $ canStack g xy           = (g, "The cell must be empty")
+  | st == C && not (capsInDeck g) = (g, "No more caps in deck")
+  | otherwise                     = placeStoneInGame g xy st
 
 handleAction :: Game -> Action -> (Game, String)
 handleAction g a = case a of
