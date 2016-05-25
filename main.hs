@@ -132,7 +132,7 @@ canStack g xy = isStackEmpty
 
 toXorY :: String -> Either X Y
 toXorY arg = if isDigit $ head arg
-  then Right (read arg :: Int)
+  then Right (read [head arg] :: Int)
   else Left  (head arg)
 
 toStoneType :: String -> StoneType
