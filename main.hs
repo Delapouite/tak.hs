@@ -47,6 +47,10 @@ type Row = [Cell]
 type X = Char
 type Y = Int
 type XY = (X, Y)
+type Move = (Int, XY, Dir, Int)
+
+-- PTN: + > - <
+data Dir = North | East | South | West deriving (Show)
 
 type Verb = String
 data Action = Action Verb [String]
@@ -80,6 +84,8 @@ capCount 4 = 0
 capCount 3 = 0
 capCount _ = 1
 
+-- inspection
+
 getSize :: Board -> Int
 getSize = truncate . sqrt . fromIntegral . length
 
@@ -97,17 +103,18 @@ getPlaced g = getPlacedByPlayer g P1 ++ getPlacedByPlayer g P2
 getPlacedByPlayerAndType :: Game -> Player -> StoneType -> [Stone]
 getPlacedByPlayerAndType g p st = filter (\(Stone _ t) -> t == st) $ getPlacedByPlayer g p
 
--- XY
-
 getCell :: Board -> XY -> Maybe Cell
 getCell b (x,y) = find (\(Cell cx cy _) -> cx == x && cy == y) b
 
 getStacks :: Game -> [Stack]
 getStacks g = map (\(Cell _ _ zs) -> zs) $ board g
 
--- 97 = ASCII 'a'
-xToInt :: X -> Int
-xToInt x = ord x - 97
+getTallerStackHeight :: [Cell] -> Int
+getTallerStackHeight cells = maximum $ map getStackHeight cells
+  where
+    getStackHeight (Cell _ _ zs) = length zs
+
+-- validation
 
 isValidX :: Game -> X -> Bool
 isValidX g x = x' >= 0 && x' <= size g
@@ -150,6 +157,12 @@ checkEnd g = if isBoardFull $ board g
     p2FlatsCount = length $ getPlacedByPlayerAndType g P2 F
     winner = if p1FlatsCount > p2FlatsCount then P1 else P2
 
+-- conversion
+
+-- 97 = ASCII 'a'
+xToInt :: X -> Int
+xToInt x = ord x - 97
+
 toXorY :: String -> Either X Y
 toXorY arg = if isDigit $ head arg
   then Right (read [head arg] :: Int)
@@ -163,11 +176,6 @@ toCols b = chunksOf (getSize b) b
 
 toRows :: Board -> [Row]
 toRows = transpose . toCols
-
-getTallerStackHeight :: [Cell] -> Int
-getTallerStackHeight cells = maximum $ map getStackHeight cells
-  where
-    getStackHeight (Cell _ _ zs) = length zs
 
 -- display
 
@@ -240,7 +248,7 @@ showDecks g = "\n" ++ showDeck g P1 ++ showDeck g P2
 showGame :: Game -> Display
 showGame g = showDecks g ++ showBoardWithAxes (board g)
 
--- actions
+-- parsers
 
 parseAction :: String -> Action
 parseAction s = Action verb args
@@ -262,6 +270,37 @@ parsePlace xy = case parseXY xy of
   Just xy -> Just (F, xy)
   _ -> Nothing
 
+-- PTN: (count)(square)(direction)(drops count)(stone)
+parseMove :: String -> Maybe Move
+parseMove str = case parseMoveCount str of
+  (count, x:y:d:drops) -> case parseXY (x:[y]) of
+    Nothing -> Nothing
+    Just xy -> case parseDir d of
+      Nothing -> Nothing
+      Just dir -> Just (count, xy, dir, parseDrops drops)
+  -- not enough chars
+  _ -> Nothing
+
+parseMoveCount :: String -> (Int, String)
+parseMoveCount (h:str) = if isDigit h
+  then (read [h], str)
+  else (1, h:str)
+
+parseDir :: Char -> Maybe Dir
+parseDir c = case c of
+  '<' -> Just West
+  '>' -> Just East
+  '+' -> Just North
+  '-' -> Just South
+  _ -> Nothing
+
+parseDrops :: String -> Int
+parseDrops str = case reads str :: [(Int, String)] of
+  [(drops, _)] -> drops
+  [] -> 1
+
+-- actions
+
 placeStone :: Board -> XY -> Stone -> Board
 placeStone b xy s = map (stackStone xy s) b
 
@@ -278,7 +317,7 @@ placeStoneInGame g xy st = (g', str)
     g' = g { board = b', turn = turn g + 1 }
     str = showBoardWithAxes b'
 
--- IO
+-- handlers
 
 handleShow :: Game -> Either X Y -> (Game, Display)
 handleShow g xory = case xory of
@@ -294,6 +333,9 @@ handlePlace g xy st
   | st == C && not (capsInDeck g) = (g, "No more caps in deck")
   | otherwise                     = placeStoneInGame g xy st
 
+handleMove :: Game -> Move -> (Game, Display)
+handleMove g m = (g, show m)
+
 handleAction :: Game -> Action -> (Game, Display)
 handleAction g a = case a of
     (Action "show" (coord:_)) -> handleShow g $ toXorY coord
@@ -301,7 +343,12 @@ handleAction g a = case a of
     (Action "place" (args:_)) -> case parsePlace args of
       Just (sType, xy) -> handlePlace g xy sType
       _ -> (g, "Wrong stone type or xy coordinates")
+    (Action "move" (args:_)) -> case parseMove args of
+      Just m -> handleMove g m
+      _ -> (g, "Wrong args for move")
     _ -> (g, "Unknown action")
+
+-- IO
 
 loop :: Game -> IO ()
 loop g = do
