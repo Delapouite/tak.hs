@@ -34,12 +34,12 @@ instance Show Stone where
   show (Stone P1 C) = "C"
   show (Stone P2 C) = "c"
 
--- bottom to top
+-- bottom to top (zs)
 type Stack = [Stone]
 
 data Cell = Cell Char Int Stack
 instance Show Cell where
-  show (Cell _ _ s) = showStack s
+  show (Cell _ _ zs) = showStack zs
 
 type Board = [Cell]
 type Col = [Cell]
@@ -50,6 +50,7 @@ type XY = (X, Y)
 
 type Verb = String
 data Action = Action Verb [String]
+type Display = String
 
 data Game = Game { size :: Int
                  , board :: Board
@@ -102,7 +103,7 @@ getCell :: Board -> XY -> Maybe Cell
 getCell b (x,y) = find (\(Cell cx cy _) -> cx == x && cy == y) b
 
 getStacks :: Game -> [Stack]
-getStacks g = map (\(Cell _ _ s) -> s) $ board g
+getStacks g = map (\(Cell _ _ zs) -> zs) $ board g
 
 -- 97 = ASCII 'a'
 xToInt :: X -> Int
@@ -127,7 +128,7 @@ canStack g xy = isStackEmpty
   where
     cell = getCell (board g) xy
     isStackEmpty = case cell of
-      Just (Cell _ _ stack) -> null stack
+      Just (Cell _ _ zs) -> null zs
       Nothing -> False
 
 capsInDeck :: Game -> Bool
@@ -136,6 +137,18 @@ capsInDeck g = totalCaps - placedCaps > 0
     p = getPlayer g
     totalCaps = capCount $ size g
     placedCaps = length $ getPlacedByPlayerAndType g p C
+
+isBoardFull :: Board -> Bool
+isBoardFull = not . any (\(Cell _ _ zs) -> null zs)
+
+checkEnd :: Game -> Maybe Display
+checkEnd g = if isBoardFull $ board g
+  then Just ("Board's full! Flat winner is " ++ show winner)
+  else Nothing
+  where
+    p1FlatsCount = length $ getPlacedByPlayerAndType g P1 F
+    p2FlatsCount = length $ getPlacedByPlayerAndType g P2 F
+    winner = if p1FlatsCount > p2FlatsCount then P1 else P2
 
 toXorY :: String -> Either X Y
 toXorY arg = if isDigit $ head arg
@@ -154,64 +167,64 @@ toRows = transpose . toCols
 getTallerStackHeight :: [Cell] -> Int
 getTallerStackHeight cells = maximum $ map getStackHeight cells
   where
-    getStackHeight (Cell _ _ stack) = length stack
+    getStackHeight (Cell _ _ zs) = length zs
 
 -- display
 
-showBoard :: Board -> String
+showBoard :: Board -> Display
 showBoard = unlines . reverse . map showCells . toRows
 
-showCells :: [Cell] -> String
+showCells :: [Cell] -> Display
 showCells = unwords . map show
 
-showStack :: Stack -> String
+showStack :: Stack -> Display
 showStack [] = "."
-showStack s = show $ last s
+showStack zs = show $ last zs
 
-showStackLevel :: [Cell] -> Int -> String
+showStackLevel :: [Cell] -> Int -> Display
 showStackLevel cs i = unwords stones
   where
     stones = map getStone cs
-    getStone (Cell _ _ stack) = if not (null stack) && (length stack - 1 >= i)
-      then show $ stack !! i
+    getStone (Cell _ _ zs) = if not (null zs) && (length zs - 1 >= i)
+      then show $ zs !! i
       else " "
 
-showStacks :: [Cell] -> String
+showStacks :: [Cell] -> Display
 showStacks cs = unlines $ map (showStackLevel cs) levels
   where
     levels = reverse [0..getTallerStackHeight cs - 1]
 
-showColByX :: Board -> X -> String
+showColByX :: Board -> X -> Display
 showColByX b x = col ++ showYAxis b
   where
     cols = toCols b
     col = showStacks . reverse $ cols !! xToInt x
 
-showRowByY :: Board -> Y -> String
+showRowByY :: Board -> Y -> Display
 showRowByY b y = row ++ showXAxis b
   where
     rows = toRows b
     row = showStacks $ rows !! (y - 1)
 
-showBoardWithYAxis :: Board -> String
+showBoardWithYAxis :: Board -> Display
 showBoardWithYAxis = unlines . reverse . map showRowWithY . toRows
 
-showBoardWithAxes :: Board -> String
+showBoardWithAxes :: Board -> Display
 showBoardWithAxes b = "\n" ++ showBoardWithYAxis b ++ "  " ++ showXAxis b
 
-showRowWithY :: Row -> String
+showRowWithY :: Row -> Display
 showRowWithY r = show y ++ " " ++ showCells r
   where
     (Cell _ y _) = head r
 
 -- horizontally
-showYAxis :: Board -> String
+showYAxis :: Board -> Display
 showYAxis b = unwords $ map show $ reverse $ take (getSize b) [1..]
 
-showXAxis :: Board -> String
+showXAxis :: Board -> Display
 showXAxis b = unwords $ map (: []) $ take (getSize b) xs
 
-showDeck :: Game -> Player -> String
+showDeck :: Game -> Player -> Display
 showDeck g p = show p ++ "'s deck: " ++ flats ++ " " ++ caps ++ "\n"
   where
     total = stoneCount $ size g
@@ -221,10 +234,10 @@ showDeck g p = show p ++ "'s deck: " ++ flats ++ " " ++ caps ++ "\n"
     flats = show (total - placed)
     caps = show (totalCaps - placedCaps) ++ show (Stone p C)
 
-showDecks :: Game -> String
+showDecks :: Game -> Display
 showDecks g = "\n" ++ showDeck g P1 ++ showDeck g P2
 
-showGame :: Game -> String
+showGame :: Game -> Display
 showGame g = showDecks g ++ showBoardWithAxes (board g)
 
 -- actions
@@ -253,11 +266,11 @@ placeStone :: Board -> XY -> Stone -> Board
 placeStone b xy s = map (stackStone xy s) b
 
 stackStone :: XY -> Stone -> Cell -> Cell
-stackStone (x,y) stone c@(Cell cx cy stack) = if x == cx && y == cy
-  then Cell cx cy (stack ++ [stone])
+stackStone (x,y) stone c@(Cell cx cy zs) = if x == cx && y == cy
+  then Cell cx cy (zs ++ [stone])
   else c
 
-placeStoneInGame :: Game -> XY -> StoneType -> (Game, String)
+placeStoneInGame :: Game -> XY -> StoneType -> (Game, Display)
 placeStoneInGame g xy st = (g', str)
   where
     b = board g
@@ -267,43 +280,45 @@ placeStoneInGame g xy st = (g', str)
 
 -- IO
 
-handleShow :: Game -> Either X Y -> (Game, String)
+handleShow :: Game -> Either X Y -> (Game, Display)
 handleShow g xory = case xory of
     Left x -> if isValidX g x then (g, showColByX b x) else (g, "Wrong x coordinate")
     Right y -> if isValidY g y then (g, showRowByY b y) else (g, "Wrong y coordinate")
   where
     b = board g
 
-handlePlace :: Game -> XY -> StoneType -> (Game, String)
+handlePlace :: Game -> XY -> StoneType -> (Game, Display)
 handlePlace g xy st
   | not $ isValidXY g xy          = (g, "Wrong xy coordinates")
   | not $ canStack g xy           = (g, "The cell must be empty")
   | st == C && not (capsInDeck g) = (g, "No more caps in deck")
   | otherwise                     = placeStoneInGame g xy st
 
-handleAction :: Game -> Action -> (Game, String)
+handleAction :: Game -> Action -> (Game, Display)
 handleAction g a = case a of
     (Action "show" (coord:_)) -> handleShow g $ toXorY coord
     (Action "show" _) -> (g, showGame g)
     (Action "place" (args:_)) -> case parsePlace args of
-      Just (st, xy) -> handlePlace g xy st
+      Just (sType, xy) -> handlePlace g xy sType
       _ -> (g, "Wrong stone type or xy coordinates")
     _ -> (g, "Unknown action")
 
 loop :: Game -> IO ()
 loop g = do
   action <- prompt $ getPrompt g
-  let tup = handleAction g $ parseAction action
-  putStrLn $ snd tup
-  loop $ fst tup
+  let (g', display) = handleAction g $ parseAction action
+  putStrLn display
+  case checkEnd g' of
+    Just reason -> putStrLn reason
+    _ -> loop g'
 
-getPrompt :: Game -> String
+getPrompt :: Game -> Display
 getPrompt g = "\nturn " ++ t ++ " / " ++ p ++ ">"
   where
     t = show $ turn g
     p = show $ getPlayer g
 
-prompt :: String -> IO String
+prompt :: String -> IO Display
 prompt q = do
   putStr $ q ++ " "
   -- http://stackoverflow.com/questions/21853343/haskell-putstr-vs-putstrln-and-instruction-order
