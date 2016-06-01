@@ -114,6 +114,12 @@ getTallerStackHeight cells = maximum $ map getStackHeight cells
   where
     getStackHeight (Cell _ _ zs) = length zs
 
+-- TODO maybeLast?
+getTopStone :: Cell -> Maybe Stone
+getTopStone (Cell _ _ zs)
+  | null zs   = Nothing
+  | otherwise = Just $ last zs
+
 -- validation
 
 isValidX :: Game -> X -> Bool
@@ -156,6 +162,13 @@ checkEnd g = if isBoardFull $ board g
     p1FlatsCount = length $ getPlacedByPlayerAndType g P1 F
     p2FlatsCount = length $ getPlacedByPlayerAndType g P2 F
     winner = if p1FlatsCount > p2FlatsCount then P1 else P2
+
+isUnderControl :: Game -> Move -> Bool
+isUnderControl g (_, xy, _, _) = case getCell (board g) xy of
+  Nothing -> False
+  Just c -> case getTopStone c of
+    Nothing -> False
+    Just (Stone owner _) -> owner == getPlayer g
 
 -- conversion
 
@@ -334,7 +347,9 @@ handlePlace g xy st
   | otherwise                     = placeStoneInGame g xy st
 
 handleMove :: Game -> Move -> (Game, Display)
-handleMove g m = (g, show m)
+handleMove g m
+  | not $ isUnderControl g m = (g, "You do not control the cell")
+  | otherwise                = (g, show m)
 
 handleAction :: Game -> Action -> (Game, Display)
 handleAction g a = case a of
