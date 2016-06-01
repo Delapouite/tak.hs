@@ -136,6 +136,12 @@ isValidXY g (x,y) = isValidX g x && isValidY g y
 isValidSize :: Int -> Bool
 isValidSize s = s >= minSize && s <= maxSize
 
+-- TODO
+-- in bounds start, carry limit
+isValidMove :: Game -> Move -> Bool
+isValidMove g (count, xy, dir, drop) =
+  isValidXY g xy && count <= (getSize $ board g)
+
 canStack :: Game -> XY -> Bool
 canStack g xy = isStackEmpty
   where
