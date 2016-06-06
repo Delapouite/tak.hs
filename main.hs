@@ -11,7 +11,7 @@
 -- Place capstone at b4: Cb4
 -- Place standing stone at d3: Sd3
 
-import Data.Char (isAlpha, isDigit, ord, toLower, toUpper)
+import Data.Char (digitToInt, isAlpha, isDigit, ord, toLower, toUpper)
 import Data.List (find, transpose)
 import Data.List.Split (chunksOf)
 import System.IO (hFlush, stdout)
@@ -137,19 +137,28 @@ isValidXY g (x,y) = isValidX g x && isValidY g y
 isValidSize :: Int -> Bool
 isValidSize s = s >= minSize && s <= maxSize
 
--- TODO
--- in bounds start, carry limit
 isValidMove :: Game -> Move -> Bool
-isValidMove g (count, xy, dir, drop) =
-  isValidXY g xy && count <= (getSize $ board g)
+isValidMove g m@(count, xy, dir, drops) =
+  isValidXY g xy && isValidCount g m && isValidDrops count drops
 
-canStack :: Game -> XY -> Bool
-canStack g xy = isStackEmpty
+-- carry limit, stack height
+isValidCount :: Game -> Move -> Bool
+isValidCount g (count, xy, _, _) =
+  count <= getSize b && validStackHeight
   where
-    cell = getCell (board g) xy
-    isStackEmpty = case cell of
-      Just (Cell _ _ zs) -> null zs
+    b = board g
+    validStackHeight = case getCell b xy of
+      Just c -> getStackHeight c <= count
       Nothing -> False
+
+isValidDrops :: Int -> Int -> Bool
+isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
+
+-- only in empty cells
+canStack :: Game -> XY -> Bool
+canStack g xy = case getCell (board g) xy of
+  Just (Cell _ _ zs) -> null zs
+  Nothing -> False
 
 capsInDeck :: Game -> Bool
 capsInDeck g = totalCaps - placedCaps > 0
@@ -176,6 +185,10 @@ isUnderControl g (_, xy, _, _) = case getCell (board g) xy of
   Just c -> case getTopStone c of
     Nothing -> False
     Just (Stone owner _) -> owner == getPlayer g
+
+-- TODO
+isDropzoneClear :: Game -> Move -> Bool
+isDropzoneClear g m = True
 
 -- conversion
 
@@ -297,10 +310,11 @@ parseMove str = case parseMoveCount str of
     Nothing -> Nothing
     Just xy -> case parseDir d of
       Nothing -> Nothing
-      Just dir -> Just (count, xy, dir, parseDrops drops)
+      Just dir -> Just (count, xy, dir, (parseDrops count drops))
   -- not enough chars
   _ -> Nothing
 
+-- default to 1
 parseMoveCount :: String -> (Int, String)
 parseMoveCount (h:str) = if isDigit h
   then (read [h], str)
@@ -314,10 +328,10 @@ parseDir c = case c of
   '-' -> Just South
   _ -> Nothing
 
-parseDrops :: String -> Int
-parseDrops str = case reads str :: [(Int, String)] of
+parseDrops :: Int -> String -> Int
+parseDrops c str = case reads str :: [(Int, String)] of
   [(drops, _)] -> drops
-  [] -> 1
+  [] -> c
 
 -- actions
 
@@ -355,8 +369,10 @@ handlePlace g xy st
 
 handleMove :: Game -> Move -> (Game, Display)
 handleMove g m
-  | not $ isUnderControl g m = (g, "You do not control the cell")
-  | otherwise                = (g, show m)
+  | not $ isValidMove g m     = (g, "Wrong args for move")
+  | not $ isUnderControl g m  = (g, "You do not control the cell")
+  | not $ isDropzoneClear g m = (g, "The dropzone is not clear")
+  | otherwise                 = (g, show m)
 
 handleAction :: Game -> Action -> (Game, Display)
 handleAction g a = case a of
