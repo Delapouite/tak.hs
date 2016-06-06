@@ -109,10 +109,11 @@ getCell b (x,y) = find (\(Cell cx cy _) -> cx == x && cy == y) b
 getStacks :: Game -> [Stack]
 getStacks g = map (\(Cell _ _ zs) -> zs) $ board g
 
+getStackHeight :: Cell -> Int
+getStackHeight (Cell _ _ zs) = length zs
+
 getTallerStackHeight :: [Cell] -> Int
 getTallerStackHeight cells = maximum $ map getStackHeight cells
-  where
-    getStackHeight (Cell _ _ zs) = length zs
 
 -- TODO maybeLast?
 getTopStone :: Cell -> Maybe Stone
