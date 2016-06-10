@@ -121,6 +121,23 @@ getTopStone (Cell _ _ zs)
   | null zs   = Nothing
   | otherwise = Just $ last zs
 
+-- beware resulting XY can be out of bounds
+getNextXY :: XY -> Dir -> XY
+getNextXY (x, y) d = case d of
+  North -> (x, succ y)
+  East  -> (succ x, y)
+  South -> (x, pred y)
+  West  -> (pred x, y)
+
+-- beware resulting XYs can be out of bounds
+getNextXYs :: XY -> Dir -> Int -> [XY]
+getNextXYs xy dir drops = tail $ foldl red [xy] (show drops)
+  where
+    red acc _ = acc ++ [getNextXY (last acc) dir]
+
+getNextCells :: Board -> Cell -> Dir -> Int -> [Maybe Cell]
+getNextCells b (Cell x y _) dir drops = map (getCell b) $ getNextXYs (x, y) dir drops
+
 -- validation
 
 isValidX :: Game -> X -> Bool
