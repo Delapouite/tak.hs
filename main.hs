@@ -150,15 +150,12 @@ isValidX g x = x' >= 0 && x' <= size g
 isValidY :: Game -> Y -> Bool
 isValidY g y = y > 0 && y <= size g
 
+-- in bounds
 isValidXY :: Game -> XY -> Bool
 isValidXY g (x,y) = isValidX g x && isValidY g y
 
 isValidSize :: Int -> Bool
 isValidSize s = s >= minSize && s <= maxSize
-
-isValidMove :: Game -> Move -> Bool
-isValidMove g m@(count, xy, dir, drops) =
-  isValidXY g xy && isValidCount g m && isValidDrops count drops
 
 -- carry limit, stack height
 isValidCount :: Game -> Move -> Bool
@@ -419,11 +416,13 @@ handlePlace g xy st
   | otherwise                     = placeStoneInGame g xy st
 
 handleMove :: Game -> Move -> (Game, Display)
-handleMove g m
-  | not $ isValidMove g m     = (g, "Wrong args for move")
-  | not $ isUnderControl g m  = (g, "You do not control the cell")
-  | not $ isDropzoneClear g m = (g, "The dropzone is not clear")
-  | otherwise                 = (g, show m)
+handleMove g m@(count, xy, dir, drops)
+  | not $ isValidXY g xy           = (g, "Wrong xy coordinates")
+  | not $ isUnderControl g m       = (g, "You do not control the cell")
+  | not $ isValidCount g m         = (g, "Wrong count")
+  | not $ isValidDrops count drops = (g, "Wrong drops")
+  | not $ isDropzoneClear g m      = (g, "The dropzone is not clear")
+  | otherwise                      = (g, show m)
 
 handleAction :: Game -> Action -> (Game, Display)
 handleAction g a = case a of
