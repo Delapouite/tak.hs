@@ -48,7 +48,8 @@ type Row = [Cell]
 type X = Char
 type Y = Int
 type XY = (X, Y)
-type Move = (Int, XY, Dir, Int)
+type Drops = Int
+type Move = (Int, XY, Dir, Drops)
 
 -- PTN: + > - <
 data Dir = North | East | South | West deriving (Show)
@@ -131,12 +132,12 @@ getNextXY (x, y) d = case d of
   West  -> (pred x, y)
 
 -- beware resulting XYs can be out of bounds
-getNextXYs :: XY -> Dir -> Int -> [XY]
+getNextXYs :: XY -> Dir -> Drops -> [XY]
 getNextXYs xy dir drops = tail $ foldl red [xy] (show drops)
   where
     red acc _ = acc ++ [getNextXY (last acc) dir]
 
-getNextCells :: Board -> Cell -> Dir -> Int -> [Maybe Cell]
+getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
 getNextCells b (Cell x y _) dir drops = map (getCell b) $ getNextXYs (x, y) dir drops
 
 -- validation
@@ -169,7 +170,7 @@ isValidCount g (count, xy, _, _) =
       Just c -> getStackHeight c <= count
       Nothing -> False
 
-isValidDrops :: Int -> Int -> Bool
+isValidDrops :: Int -> Drops -> Bool
 isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
 
 -- only in empty cells
@@ -204,6 +205,25 @@ isUnderControl g (_, xy, _, _) = case getCell (board g) xy of
     Nothing -> False
     Just (Stone owner _) -> owner == getPlayer g
 
+-- F or empty cell
+isToppable :: Cell -> Bool
+isToppable c = case getTopStone c of
+  Just (Stone _ t) -> t == F
+  Nothing -> True
+
+-- C on top of stack
+hasCap :: Cell -> Bool
+hasCap c = case getTopStone c of
+  Just (Stone _ t) -> t == C
+  Nothing -> False
+
+-- S and last drop == 1
+isFlattenable :: Cell -> Drops -> Bool
+isFlattenable c drops = case getTopStone c of
+  Nothing -> False
+  -- a cap can only flatten when alone
+  Just (Stone _ t) -> t == S && ((last . show $ drops) == '1')
+
 -- TODO
 isDropzoneClear :: Game -> Move -> Bool
 isDropzoneClear g (count, xy, dir, drops) = clear
@@ -212,15 +232,14 @@ isDropzoneClear g (count, xy, dir, drops) = clear
     Just cell = getCell b xy
     nextMCells = filter isJust $ getNextCells b cell dir drops
     nextCells = map fromJust nextMCells
+
     -- conditions
     inBounds = length nextMCells == (length . show) drops
-    topStones = map getTopStone nextCells
-    isWall mstone = case mstone of
-      Just (Stone _ t) -> t == S
-      Nothing -> False
-    walls = any isWall topStones
+    initToppable = all isToppable $ init nextCells
+    end = last nextCells
+    isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)
 
-    clear = inBounds && not walls
+    clear = inBounds && initToppable && isValidEnd
 
 -- conversion
 
@@ -360,7 +379,7 @@ parseDir c = case c of
   '-' -> Just South
   _ -> Nothing
 
-parseDrops :: Int -> String -> Int
+parseDrops :: Drops -> String -> Drops
 parseDrops c str = case reads str :: [(Int, String)] of
   [(drops, _)] -> drops
   [] -> c
