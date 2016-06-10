@@ -37,7 +37,7 @@ instance Show Stone where
 -- bottom to top (zs)
 type Stack = [Stone]
 
-data Cell = Cell Char Int Stack
+data Cell = Cell X Y Stack
 instance Show Cell where
   show (Cell _ _ zs) = showStack zs
 
