@@ -14,6 +14,7 @@
 import Data.Char (digitToInt, isAlpha, isDigit, ord, toLower, toUpper)
 import Data.List (find, transpose)
 import Data.List.Split (chunksOf)
+import Data.Maybe (isJust)
 import System.IO (hFlush, stdout)
 import Text.Read (readMaybe)
 
@@ -205,7 +206,12 @@ isUnderControl g (_, xy, _, _) = case getCell (board g) xy of
 
 -- TODO
 isDropzoneClear :: Game -> Move -> Bool
-isDropzoneClear g m = True
+isDropzoneClear g (count, xy, dir, drops) = clear
+  where
+    b = board g
+    Just cell = getCell b xy
+    nextCells = filter isJust $ getNextCells b cell dir drops
+    clear = length nextCells == (length . show) drops
 
 -- conversion
 
