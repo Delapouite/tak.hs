@@ -14,7 +14,7 @@
 import Data.Char (digitToInt, isAlpha, isDigit, ord, toLower, toUpper)
 import Data.List (find, transpose)
 import Data.List.Split (chunksOf)
-import Data.Maybe (isJust)
+import Data.Maybe (isJust, fromJust)
 import System.IO (hFlush, stdout)
 import Text.Read (readMaybe)
 
@@ -210,8 +210,17 @@ isDropzoneClear g (count, xy, dir, drops) = clear
   where
     b = board g
     Just cell = getCell b xy
-    nextCells = filter isJust $ getNextCells b cell dir drops
-    clear = length nextCells == (length . show) drops
+    nextMCells = filter isJust $ getNextCells b cell dir drops
+    nextCells = map fromJust nextMCells
+    -- conditions
+    inBounds = length nextMCells == (length . show) drops
+    topStones = map getTopStone nextCells
+    isWall mstone = case mstone of
+      Just (Stone _ t) -> t == S
+      Nothing -> False
+    walls = any isWall topStones
+
+    clear = inBounds && not walls
 
 -- conversion
 
