@@ -32,8 +32,10 @@ data Cell = Cell XY Stack
 type Board = [Cell]
 type Col = [Cell]
 type Row = [Cell]
+
+type Count = Int
 type Drops = Int
-type Move = (Int, XY, Dir, Drops)
+type Move = (Count, XY, Dir, Drops)
 
 -- PTN: + > - <
 data Dir = North | East | South | West deriving (Show)

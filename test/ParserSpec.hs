@@ -11,5 +11,12 @@ testsParseXY = TestList
   , TestCase $ parseXY "3b" @?= Nothing
   ]
 
+testsParseMoveCount = TestList
+  [ TestCase $ parseMoveCount "b3>" @?= (1, "b3>")
+  , TestCase $ parseMoveCount "4b3>" @?= (4, "b3>")
+  ]
+
 testsParser = TestList
-  [ testsParseXY ]
+  [ testsParseXY
+  , testsParseMoveCount
+  ]

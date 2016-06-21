@@ -37,7 +37,7 @@ parseMove str = case parseMoveCount str of
   _ -> Nothing
 
 -- default to 1
-parseMoveCount :: String -> (Int, String)
+parseMoveCount :: String -> (Count, String)
 parseMoveCount (h:str) = if isDigit h
   then (read [h], str)
   else (1, h:str)
@@ -50,7 +50,7 @@ parseDir c = case c of
   '-' -> Just South
   _ -> Nothing
 
-parseDrops :: Drops -> String -> Drops
+parseDrops :: Count -> String -> Drops
 parseDrops c str = case reads str :: [(Int, String)] of
   [(drops, _)] -> drops
   [] -> c

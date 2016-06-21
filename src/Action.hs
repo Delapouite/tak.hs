@@ -16,7 +16,7 @@ stackStones xy stones c@(Cell xy' zs) = if xy == xy'
   then Cell xy (flattenStack zs ++ stones)
   else c
 
-unstackStones :: XY -> Int -> Cell -> Cell
+unstackStones :: XY -> Count -> Cell -> Cell
 unstackStones xy count c@(Cell xy' zs) = if xy == xy'
   then Cell xy (drop count $ reverse zs)
   else c
@@ -32,7 +32,7 @@ placeStoneInGame g xy st = (g', showBoardWithAxes b')
 flattenStack :: Stack -> Stack
 flattenStack = map (\(Stone p t) -> (Stone p F))
 
-moveSubstack :: Board -> Int -> XY -> XY -> Board
+moveSubstack :: Board -> Count -> XY -> XY -> Board
 moveSubstack b count fromXY toXY = map (stackStones toXY stones) b'
   where
     Just (Cell _ zs) = getCell b fromXY
