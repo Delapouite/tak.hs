@@ -38,7 +38,7 @@ type Drops = Int
 type Move = (Count, XY, Dir, Drops)
 
 -- PTN: + > - <
-data Dir = North | East | South | West deriving (Show)
+data Dir = North | East | South | West deriving (Eq, Show)
 
 type Verb = String
 data Action = Action Verb [String]
