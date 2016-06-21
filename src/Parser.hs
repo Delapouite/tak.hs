@@ -27,7 +27,7 @@ parsePlace xy = case parseXY xy of
 
 -- PTN: (count)(square)(direction)(drops count)(stone)
 parseMove :: String -> Maybe Move
-parseMove str = case parseMoveCount str of
+parseMove str = case parseCount str of
   (count, x:y:d:drops) -> case parseXY (x:[y]) of
     Nothing -> Nothing
     Just xy -> case parseDir d of
@@ -37,8 +37,8 @@ parseMove str = case parseMoveCount str of
   _ -> Nothing
 
 -- default to 1
-parseMoveCount :: String -> (Count, String)
-parseMoveCount (h:str) = if isDigit h
+parseCount :: String -> (Count, String)
+parseCount (h:str) = if isDigit h
   then (read [h], str)
   else (1, h:str)
 
