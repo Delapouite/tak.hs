@@ -29,11 +29,11 @@ getCell b xy = find (\(Cell xy' _) -> xy == xy') b
 getStacks :: Game -> [Stack]
 getStacks g = map (\(Cell _ zs) -> zs) $ board g
 
-getStackHeight :: Cell -> Int
-getStackHeight (Cell _ zs) = length zs
+getHeight :: Cell -> Int
+getHeight (Cell _ zs) = length zs
 
-getTallerStackHeight :: [Cell] -> Int
-getTallerStackHeight cells = maximum $ map getStackHeight cells
+getTallestHeight :: [Cell] -> Int
+getTallestHeight cells = maximum $ map getHeight cells
 
 -- TODO maybeLast?
 getTopStone :: Cell -> Maybe Stone

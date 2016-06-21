@@ -28,7 +28,7 @@ isValidCount g (count, xy, _, _) =
   where
     b = board g
     validStackHeight = case getCell b xy of
-      Just c -> getStackHeight c >= count
+      Just c -> getHeight c >= count
       Nothing -> False
 
 isValidDrops :: Int -> Drops -> Bool
