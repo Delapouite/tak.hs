@@ -5,22 +5,11 @@ import Test.HUnit
 import Tak
 import Parser
 
-testParseXY1 = TestCase $ assertEqual "Should return the correct XY" exp act
-  where
-    exp = Just ('b', 3)
-    act = parseXY "b3"
-
-testParseXY2 = TestCase $ assertEqual "Should return the correct XY" exp act
-  where
-    exp = Nothing
-    act = parseXY "3b"
-
-testParseXY3 = TestCase $ assertEqual "Should return the correct XY" exp act
-  where
-    exp = Just ('b', 3)
-    act = parseXY "B3"
-
-testsParseXY = TestList [ testParseXY1, testParseXY2, testParseXY3 ]
+testsParseXY = TestList
+  [ TestCase $ parseXY "b3" @?= Just ('b', 3)
+  , TestCase $ parseXY "B3" @?= Just ('b', 3)
+  , TestCase $ parseXY "3b" @?= Nothing
+  ]
 
 testsParser = TestList
   [ testsParseXY ]
