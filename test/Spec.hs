@@ -1,5 +1,10 @@
 import Test.HUnit
+
 import ConversionSpec
+import ParserSpec
 
 main :: IO Counts
-main = runTestTT $ TestList [ testGetSize ]
+main = runTestTT $ TestList
+  [ testsConversion
+  , testsParser
+  ]
