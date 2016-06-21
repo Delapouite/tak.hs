@@ -35,12 +35,13 @@ instance Show Stone where
   show (Stone P1 C) = "C"
   show (Stone P2 C) = "c"
 
+-- TODO reverse order?
 -- bottom to top (zs)
 type Stack = [Stone]
 
-data Cell = Cell X Y Stack
+data Cell = Cell XY Stack
 instance Show Cell where
-  show (Cell _ _ zs) = showStack zs
+  show (Cell _ zs) = showStack zs
 
 type Board = [Cell]
 type Col = [Cell]
@@ -70,7 +71,7 @@ maxSize = 8
 xs = ['a'..]
 
 initBoard :: Int -> Board
-initBoard size = take (size ^ 2) [Cell x y [] | x <- xs, y <- [1..size]]
+initBoard size = take (size ^ 2) [Cell (x, y) [] | x <- xs, y <- [1..size]]
 
 stoneCount :: Int -> Int
 stoneCount 3 = 10
@@ -106,20 +107,20 @@ getPlacedByPlayerAndType :: Game -> Player -> StoneType -> [Stone]
 getPlacedByPlayerAndType g p st = filter (\(Stone _ t) -> t == st) $ getPlacedByPlayer g p
 
 getCell :: Board -> XY -> Maybe Cell
-getCell b (x,y) = find (\(Cell cx cy _) -> cx == x && cy == y) b
+getCell b xy = find (\(Cell xy' _) -> xy == xy') b
 
 getStacks :: Game -> [Stack]
-getStacks g = map (\(Cell _ _ zs) -> zs) $ board g
+getStacks g = map (\(Cell _ zs) -> zs) $ board g
 
 getStackHeight :: Cell -> Int
-getStackHeight (Cell _ _ zs) = length zs
+getStackHeight (Cell _ zs) = length zs
 
 getTallerStackHeight :: [Cell] -> Int
 getTallerStackHeight cells = maximum $ map getStackHeight cells
 
 -- TODO maybeLast?
 getTopStone :: Cell -> Maybe Stone
-getTopStone (Cell _ _ zs)
+getTopStone (Cell _ zs)
   | null zs   = Nothing
   | otherwise = Just $ last zs
 
@@ -138,7 +139,7 @@ getNextXYs xy dir drops = tail $ foldl red [xy] (show drops)
     red acc _ = acc ++ [getNextXY (last acc) dir]
 
 getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
-getNextCells b (Cell x y _) dir drops = map (getCell b) $ getNextXYs (x, y) dir drops
+getNextCells b (Cell xy _) dir drops = map (getCell b) $ getNextXYs xy dir drops
 
 -- validation
 
@@ -173,7 +174,7 @@ isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
 -- only in empty cells
 canStack :: Game -> XY -> Bool
 canStack g xy = case getCell (board g) xy of
-  Just (Cell _ _ zs) -> null zs
+  Just (Cell _ zs) -> null zs
   Nothing -> False
 
 capsInDeck :: Game -> Bool
@@ -184,7 +185,7 @@ capsInDeck g = totalCaps - placedCaps > 0
     placedCaps = length $ getPlacedByPlayerAndType g p C
 
 isBoardFull :: Board -> Bool
-isBoardFull = not . any (\(Cell _ _ zs) -> null zs)
+isBoardFull = not . any (\(Cell _ zs) -> null zs)
 
 checkEnd :: Game -> Maybe Display
 checkEnd g = if isBoardFull $ board g
@@ -221,7 +222,6 @@ isFlattenable c drops = case getTopStone c of
   -- a cap can only flatten when alone
   Just (Stone _ t) -> t == S && ((last . show $ drops) == '1')
 
--- TODO
 isDropzoneClear :: Game -> Move -> Bool
 isDropzoneClear g (count, xy, dir, drops) = clear
   where
@@ -274,7 +274,7 @@ showStackLevel :: [Cell] -> Int -> Display
 showStackLevel cs i = unwords stones
   where
     stones = map getStone cs
-    getStone (Cell _ _ zs) = if not (null zs) && (length zs - 1 >= i)
+    getStone (Cell _ zs) = if not (null zs) && (length zs - 1 >= i)
       then show $ zs !! i
       else " "
 
@@ -304,7 +304,7 @@ showBoardWithAxes b = "\n" ++ showBoardWithYAxis b ++ "  " ++ showXAxis b
 showRowWithY :: Row -> Display
 showRowWithY r = show y ++ " " ++ showCells r
   where
-    (Cell _ y _) = head r
+    (Cell (_, y) _) = head r
 
 -- horizontally
 showYAxis :: Board -> Display
@@ -384,20 +384,50 @@ parseDrops c str = case reads str :: [(Int, String)] of
 -- actions
 
 placeStone :: Board -> XY -> Stone -> Board
-placeStone b xy s = map (stackStone xy s) b
+placeStone b xy stone = map (stackStones xy [stone]) b
 
-stackStone :: XY -> Stone -> Cell -> Cell
-stackStone (x,y) stone c@(Cell cx cy zs) = if x == cx && y == cy
-  then Cell cx cy (zs ++ [stone])
+stackStones :: XY -> [Stone] -> Cell -> Cell
+stackStones xy stones c@(Cell xy' zs) = if xy == xy'
+  then Cell xy (flattenStack zs ++ stones)
+  else c
+
+unstackStones :: XY -> Int -> Cell -> Cell
+unstackStones xy count c@(Cell xy' zs) = if xy == xy'
+  then Cell xy (drop count $ reverse zs)
   else c
 
 placeStoneInGame :: Game -> XY -> StoneType -> (Game, Display)
-placeStoneInGame g xy st = (g', str)
+placeStoneInGame g xy st = (g', showBoardWithAxes b')
   where
     b = board g
     b' = placeStone b xy (Stone (getPlayer g) st)
     g' = g { board = b', turn = turn g + 1 }
-    str = showBoardWithAxes b'
+
+-- turn all stones to F
+flattenStack :: Stack -> Stack
+flattenStack = map (\(Stone p t) -> (Stone p F))
+
+moveSubstack :: Board -> Int -> XY -> XY -> Board
+moveSubstack b count fromXY toXY = map (stackStones toXY stones) b'
+  where
+    Just (Cell _ zs) = getCell b fromXY
+    stones = take count $ reverse zs
+    b' = map (unstackStones fromXY count) b
+
+-- TODO
+moveStack :: Game -> Move -> (Game, Display)
+moveStack g m@(count, xy, dir, drops) = (g', showBoardWithAxes b')
+  where
+    b = board g
+    reducer acc (xy, drop) = moveSubstack acc drop xy (getNextXY xy dir)
+    b' = foldl reducer b $ zipXYandDrops m
+    g' = g { board = b', turn = turn g + 1 }
+
+zipXYandDrops :: Move -> [(XY, Int)]
+zipXYandDrops m@(count, xy, dir, drops) = zip xys drops'
+  where
+    xys = getNextXYs xy dir drops
+    drops' = map digitToInt (show drops)
 
 -- handlers
 
@@ -422,7 +452,7 @@ handleMove g m@(count, xy, dir, drops)
   | not $ isValidCount g m         = (g, "Wrong count")
   | not $ isValidDrops count drops = (g, "Wrong drops")
   | not $ isDropzoneClear g m      = (g, "The dropzone is not clear")
-  | otherwise                      = (g, show m)
+  | otherwise                      = moveStack g m
 
 handleAction :: Game -> Action -> (Game, Display)
 handleAction g a = case a of
