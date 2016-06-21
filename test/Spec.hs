@@ -1,5 +1,5 @@
 import Test.HUnit
-import Lib
+import ConversionSpec
 
-main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main :: IO Counts
+main = runTestTT $ TestList [ testGetSize ]
