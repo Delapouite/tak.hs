@@ -58,8 +58,8 @@ zipXYandDrops m@(count, xy, dir, drops) = zip xys drops'
 
 handleShow :: Game -> Either X Y -> (Game, Display)
 handleShow g xory = case xory of
-    Left x -> if isValidX g x then (g, showColByX b x) else (g, "Wrong x coordinate")
-    Right y -> if isValidY g y then (g, showRowByY b y) else (g, "Wrong y coordinate")
+    Left x -> if isValidX g x then (g, showCol b x) else (g, "Wrong x coordinate")
+    Right y -> if isValidY g y then (g, showRow b y) else (g, "Wrong y coordinate")
   where
     b = board g
 

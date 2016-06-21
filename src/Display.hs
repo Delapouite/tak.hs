@@ -37,14 +37,14 @@ showStacks cs = unlines $ map (showStackLevel cs) levels
   where
     levels = reverse [0..getTallerStackHeight cs - 1]
 
-showColByX :: Board -> X -> Display
-showColByX b x = col ++ showYAxis b
+showCol :: Board -> X -> Display
+showCol b x = col ++ showYAxis b
   where
     cols = toCols b
     col = showStacks . reverse $ cols !! xToInt x
 
-showRowByY :: Board -> Y -> Display
-showRowByY b y = row ++ showXAxis b
+showRow :: Board -> Y -> Display
+showRow b y = row ++ showXAxis b
   where
     rows = toRows b
     row = showStacks $ rows !! (y - 1)
