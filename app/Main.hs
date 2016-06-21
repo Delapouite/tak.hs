@@ -1,3 +1,5 @@
+module Main where
+
 -- https://www.youtube.com/watch?v=iEXkpS-Q9dI
 
 -- Coordinates system according to Portable Tak Notation
