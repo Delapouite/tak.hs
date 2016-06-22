@@ -19,6 +19,11 @@ testsToXorY = TestList
   , TestCase $ toXorY "4" @?= Right 4
   ]
 
+testsToStoneType = TestList
+  [ TestCase $ toStoneType "s" @?= S
+  , TestCase $ toStoneType "F" @?= F
+  ]
+
 testsGetSize = TestCase $ assertEqual "Should return side length of the Board" exp act
   where
     exp = 5
@@ -33,8 +38,9 @@ testsGetTallestHeight = TestList
   [ TestCase $ getTallestHeight [mockCell1, mockCell2] @?= 3 ]
 
 testsConversion = TestList
-  [ testsGetSize
-  , testsXtoInt
+  [ testsXtoInt
   , testsToXorY
+  , testsToStoneType
+  , testsGetSize
   , testsGetHeight
   ]

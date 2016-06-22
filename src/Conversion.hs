@@ -68,7 +68,7 @@ toXorY arg = if isDigit $ head arg
   else Left  (head arg)
 
 toStoneType :: String -> StoneType
-toStoneType arg = read (map toUpper arg) :: StoneType
+toStoneType str = read (map toUpper str) :: StoneType
 
 toCols :: Board -> [Col]
 toCols b = chunksOf (getSize b) b
