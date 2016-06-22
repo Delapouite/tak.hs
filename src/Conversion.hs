@@ -76,4 +76,6 @@ toCols b = chunksOf (getSize b) b
 toRows :: Board -> [Row]
 toRows = transpose . toCols
 
-
+toPlayer :: String -> Player
+toPlayer "1" = P1
+toPlayer _ = P2

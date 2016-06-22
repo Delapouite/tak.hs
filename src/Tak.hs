@@ -18,7 +18,7 @@ data Player = P1 | P2 deriving (Eq, Show)
 data StoneType = F | S | C deriving (Eq, Show, Read)
 
 -- P1 in UpperCase, P2 in LowerCase
-data Stone = Stone Player StoneType
+data Stone = Stone Player StoneType deriving (Eq)
 
 type X = Char
 type Y = Int
@@ -27,7 +27,7 @@ type XY = (X, Y)
 -- bottom to top (zs)
 type Stack = [Stone]
 
-data Cell = Cell XY Stack
+data Cell = Cell XY Stack deriving (Eq)
 
 type Board = [Cell]
 type Col = [Cell]
