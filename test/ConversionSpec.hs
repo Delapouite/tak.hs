@@ -37,10 +37,18 @@ testsGetHeight = TestList
 testsGetTallestHeight = TestList
   [ TestCase $ getTallestHeight [mockCell1, mockCell2] @?= 3 ]
 
+testsGetNextXY = TestList
+  [ TestCase $ getNextXY ('b', 2) North @?= ('b', 3)
+  , TestCase $ getNextXY ('b', 2) East  @?= ('c', 2)
+  , TestCase $ getNextXY ('b', 2) South @?= ('b', 1)
+  , TestCase $ getNextXY ('b', 2) West  @?= ('a', 2)
+  ]
+
 testsConversion = TestList
   [ testsXtoInt
   , testsToXorY
   , testsToStoneType
   , testsGetSize
   , testsGetHeight
+  , testsGetNextXY
   ]
