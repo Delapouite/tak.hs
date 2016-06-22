@@ -46,6 +46,7 @@ test-suite tak-test
                      , split
   other-modules:       ConversionSpec
                      , ParserSpec
+                     , ValidationSpec
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 
