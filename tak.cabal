@@ -44,7 +44,8 @@ test-suite tak-test
                      , test-framework-hunit
                      , HUnit
                      , split
-  other-modules:       ConversionSpec
+  other-modules:       ActionSpec
+                     , ConversionSpec
                      , ParserSpec
                      , ValidationSpec
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
