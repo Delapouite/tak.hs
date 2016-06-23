@@ -18,14 +18,14 @@ updateGame g b = g { board = b, player = p, turn = t }
 updateAndShowGame :: Game -> Board -> (Game, Display)
 updateAndShowGame g b = (updateGame g b, showBoardWithAxes b)
 
-stackStones :: XY -> [Stone] -> Cell -> Cell
+stackStones :: XY -> Stack -> Cell -> Cell
 stackStones xy stones c@(Cell xy' zs) = if xy == xy'
   then Cell xy (flattenStack zs ++ stones)
   else c
 
 unstackStones :: XY -> Count -> Cell -> Cell
 unstackStones xy count c@(Cell xy' zs) = if xy == xy'
-  then Cell xy (drop count $ reverse zs)
+  then Cell xy (reverse (drop count $ reverse zs))
   else c
 
 placeStone :: Board -> XY -> Player -> StoneType -> Board
@@ -36,7 +36,7 @@ flattenStack :: Stack -> Stack
 flattenStack = map (\(Stone p t) -> (Stone p F))
 
 moveSubstack :: Board -> Count -> XY -> XY -> Board
-moveSubstack b count fromXY toXY = map (stackStones toXY stones) b'
+moveSubstack b count fromXY toXY = map (stackStones toXY (reverse stones)) b'
   where
     Just (Cell _ zs) = getCell b fromXY
     stones = take count $ reverse zs
