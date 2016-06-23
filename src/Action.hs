@@ -51,7 +51,7 @@ moveStack g m@(count, xy, dir, drops) = (updateGame g b', showBoardWithAxes b')
 zipXYandDrops :: Move -> [(XY, Int)]
 zipXYandDrops m@(count, xy, dir, drops) = zip xys drops'
   where
-    xys = getNextXYs xy dir drops
+    xys = init $ xy : getNextXYs xy dir drops
     drops' = map digitToInt (show drops)
 
 -- handlers
