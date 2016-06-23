@@ -38,15 +38,16 @@ testsMoveSubstack = TestList
     ]
   ]
 
-testsZipXYandDrops = TestList
-  [ TestCase $ zipXYandDrops (1, ('b', 2), East, 1) @?= [(('b', 2), 1)]
-  , TestCase $ zipXYandDrops (3, ('b', 2), East, 21) @?= [(('b', 2), 2), (('c', 2), 1)]
-  , TestCase $ zipXYandDrops (3, ('b', 2), East, 111) @?= [(('b', 2), 1), (('c', 2), 1), (('d', 2), 1)]
+testsZipXYandCounts = TestList
+  [ TestCase $ zipXYandCounts (1, ('b', 2), East, 1) @?= [(('b', 2), 1)]
+  , TestCase $ zipXYandCounts (3, ('b', 2), East, 21) @?= [(('b', 2), 3), (('c', 2), 1)]
+  , TestCase $ zipXYandCounts (3, ('b', 2), East, 111) @?= [(('b', 2), 3), (('c', 2), 2), (('d', 2), 1)]
+  , TestCase $ zipXYandCounts (4, ('b', 2), East, 121) @?= [(('b', 2), 4), (('c', 2), 3), (('d', 2), 1)]
   ]
 
 testsAction = TestList
   [ testsStackStones
   , testsUnstackStones
   , testsMoveSubstack
-  , testsZipXYandDrops
+  , testsZipXYandCounts
   ]

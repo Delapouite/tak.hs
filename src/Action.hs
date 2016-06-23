@@ -15,6 +15,9 @@ updateGame g b = g { board = b, player = p, turn = t }
     -- new turn?
     t = if p == P1 then turn g + 1 else turn g
 
+updateAndShowGame :: Game -> Board -> (Game, Display)
+updateAndShowGame g b = (updateGame g b, showBoardWithAxes b)
+
 stackStones :: XY -> [Stone] -> Cell -> Cell
 stackStones xy stones c@(Cell xy' zs) = if xy == xy'
   then Cell xy (flattenStack zs ++ stones)
@@ -25,10 +28,8 @@ unstackStones xy count c@(Cell xy' zs) = if xy == xy'
   then Cell xy (drop count $ reverse zs)
   else c
 
-placeStone :: Game -> XY -> StoneType -> (Game, Display)
-placeStone g xy st = (updateGame g b', showBoardWithAxes b')
-  where
-    b' = map (stackStones xy [Stone (player g) st]) $ board g
+placeStone :: Board -> XY -> Player -> StoneType -> Board
+placeStone b xy p st = map (stackStones xy [Stone p st]) b
 
 -- turn all stones to F
 flattenStack :: Stack -> Stack
@@ -42,17 +43,18 @@ moveSubstack b count fromXY toXY = map (stackStones toXY stones) b'
     b' = map (unstackStones fromXY count) b
 
 -- TODO
-moveStack :: Game -> Move -> (Game, Display)
-moveStack g m@(count, xy, dir, drops) = (updateGame g b', showBoardWithAxes b')
+moveStack :: Board -> Move -> Board
+moveStack b m@(count, xy, dir, drops) = foldl reducer b $ zipXYandCounts m
   where
     reducer acc (xy, drop) = moveSubstack acc drop xy (getNextXY xy dir)
-    b' = foldl reducer (board g) $ zipXYandDrops m
 
-zipXYandDrops :: Move -> [(XY, Int)]
-zipXYandDrops m@(count, xy, dir, drops) = zip xys drops'
+zipXYandCounts :: Move -> [(XY, Count)]
+zipXYandCounts m@(count, xy, dir, drops) = zip xys counts
   where
     xys = init $ xy : getNextXYs xy dir drops
     drops' = map digitToInt (show drops)
+    counts = foldl reducer [count] $ init drops'
+    reducer acc drop = acc ++ [last acc - drop]
 
 -- handlers
 
@@ -68,7 +70,7 @@ handlePlace g xy st
   | not $ isValidXY g xy          = (g, "Wrong xy coordinates")
   | not $ canPlace (board g) xy   = (g, "The cell must be empty")
   | st == C && not (capsInDeck g) = (g, "No more caps in deck")
-  | otherwise                     = placeStone g xy st
+  | otherwise                     = updateAndShowGame g $ placeStone (board g) xy (player g) st
 
 handleMove :: Game -> Move -> (Game, Display)
 handleMove g m@(count, xy, dir, drops)
@@ -77,7 +79,8 @@ handleMove g m@(count, xy, dir, drops)
   | not $ isValidCount g m         = (g, "Wrong count")
   | not $ isValidDrops count drops = (g, "Wrong drops")
   | not $ isDropzoneClear g m      = (g, "The dropzone is not clear")
-  | otherwise                      = moveStack g m
+  | otherwise                      = updateAndShowGame g $ moveStack (board g) m
+
 
 handleAction :: Game -> Action -> (Game, Display)
 handleAction g a = case a of
