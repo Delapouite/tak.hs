@@ -16,7 +16,14 @@ testsUnstackStones = TestList
   , TestCase $ unstackStones ('a', 2) 2 (Cell ('a', 2) [Stone P2 F, Stone P1 C]) @?= Cell ('a', 2) []
   ]
 
+testsZipXYandDrops = TestList
+  [ TestCase $ zipXYandDrops (1, ('b', 2), East, 1) @?= [(('c', 2), 1)]
+  , TestCase $ zipXYandDrops (3, ('b', 2), East, 21) @?= [(('c', 2), 2), (('d', 2), 1)]
+  , TestCase $ zipXYandDrops (3, ('b', 2), East, 111) @?= [(('c', 2), 1), (('d', 2), 1), (('e', 2), 1)]
+  ]
+
 testsAction = TestList
   [ testsStackStones
   , testsUnstackStones
+  , testsZipXYandDrops
   ]
