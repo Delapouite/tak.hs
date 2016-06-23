@@ -6,6 +6,18 @@ import Tak
 import Display
 import Parser
 
+testsParseMove = TestList
+  [ TestCase $ parseMove "b2" @?= Nothing
+  , TestCase $ parseMove "2b" @?= Nothing
+  , TestCase $ parseMove "2bb" @?= Nothing
+  , TestCase $ parseMove "2b1" @?= Nothing
+  , TestCase $ parseMove "2b1!" @?= Nothing
+
+  , TestCase $ parseMove "b1+" @?= Just (1, ('b', 1), North, 1)
+  , TestCase $ parseMove "2b1>" @?= Just (2, ('b', 1), East, 2)
+  , TestCase $ parseMove "2b1>11" @?= Just (2, ('b', 1), East, 11)
+  ]
+
 testsParseXY = TestList
   [ TestCase $ parseXY "b3" @?= Just ('b', 3)
   , TestCase $ parseXY "B3" @?= Just ('b', 3)
@@ -87,6 +99,7 @@ testsParseTPSStack = TestList
 
 testsParser = TestList
   [ testsParseXY
+  , testsParseMove
   , testsParseCount
   , testsParseDir
   , testsParseDrops
