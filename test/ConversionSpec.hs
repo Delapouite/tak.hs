@@ -44,6 +44,14 @@ testsGetNextXY = TestList
   , TestCase $ getNextXY ('b', 2) West  @?= ('a', 2)
   ]
 
+testsGetNextXYs = TestList
+  [ TestCase $ getNextXYs ('b', 2) East 1 @?= [('c', 2)]
+  , TestCase $ getNextXYs ('b', 2) East 2 @?= [('c', 2)]
+  , TestCase $ getNextXYs ('b', 2) East 21 @?= [('c', 2), ('d', 2)]
+  , TestCase $ getNextXYs ('b', 2) North 21 @?= [('b', 3), ('b', 4)]
+  , TestCase $ getNextXYs ('b', 2) North 212 @?= [('b', 3), ('b', 4), ('b', 5)]
+  ]
+
 testsConversion = TestList
   [ testsXtoInt
   , testsToXorY
@@ -51,4 +59,5 @@ testsConversion = TestList
   , testsGetSize
   , testsGetHeight
   , testsGetNextXY
+  , testsGetNextXYs
   ]
