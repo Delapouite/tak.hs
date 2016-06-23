@@ -15,9 +15,6 @@ updateGame g b = g { board = b, player = p, turn = t }
     -- new turn?
     t = if p == P1 then turn g + 1 else turn g
 
-placeStone :: Board -> XY -> Stone -> Board
-placeStone b xy stone = map (stackStones xy [stone]) b
-
 stackStones :: XY -> [Stone] -> Cell -> Cell
 stackStones xy stones c@(Cell xy' zs) = if xy == xy'
   then Cell xy (flattenStack zs ++ stones)
@@ -28,10 +25,10 @@ unstackStones xy count c@(Cell xy' zs) = if xy == xy'
   then Cell xy (drop count $ reverse zs)
   else c
 
-placeStoneInGame :: Game -> XY -> StoneType -> (Game, Display)
-placeStoneInGame g xy st = (updateGame g b', showBoardWithAxes b')
+placeStone :: Game -> XY -> StoneType -> (Game, Display)
+placeStone g xy st = (updateGame g b', showBoardWithAxes b')
   where
-    b' = placeStone (board g) xy (Stone (player g) st)
+    b' = map (stackStones xy [Stone (player g) st]) $ board g
 
 -- turn all stones to F
 flattenStack :: Stack -> Stack
@@ -71,7 +68,7 @@ handlePlace g xy st
   | not $ isValidXY g xy          = (g, "Wrong xy coordinates")
   | not $ canPlace (board g) xy   = (g, "The cell must be empty")
   | st == C && not (capsInDeck g) = (g, "No more caps in deck")
-  | otherwise                     = placeStoneInGame g xy st
+  | otherwise                     = placeStone g xy st
 
 handleMove :: Game -> Move -> (Game, Display)
 handleMove g m@(count, xy, dir, drops)
