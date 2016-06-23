@@ -31,7 +31,7 @@ isValidCount g (count, xy, _, _) =
       Just c -> getHeight c >= count
       Nothing -> False
 
-isValidDrops :: Int -> Drops -> Bool
+isValidDrops :: Count -> Drops -> Bool
 isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
 
 -- only in empty cells
@@ -100,5 +100,4 @@ isDropzoneClear g (count, xy, dir, drops) = clear
     isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)
 
     clear = inBounds && initToppable && isValidEnd
-
 

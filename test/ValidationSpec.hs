@@ -5,6 +5,13 @@ import Test.HUnit
 import Tak
 import Validation
 
+testsIsValidDrops = TestList
+  [ TestCase $ isValidDrops 3 3 @?= True
+  , TestCase $ isValidDrops 4 3 @?= False
+  , TestCase $ isValidDrops 4 121 @?= True
+  , TestCase $ isValidDrops 4 122 @?= False
+  ]
+
 testsCanPlace = TestList
   [ TestCase $ True @=? canPlace
      [ Cell ('a', 1) []
@@ -65,7 +72,8 @@ testsHasCap = TestList
   ]
 
 testsValidation = TestList
-  [ testsCanPlace
+  [ testsIsValidDrops
+  , testsCanPlace
   , testsIsBoardFull
   , testsIsToppable
   , testsHasCap
