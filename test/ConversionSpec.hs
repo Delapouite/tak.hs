@@ -4,6 +4,7 @@ import Test.HUnit
 
 import Tak
 import Conversion
+import Display
 
 mockStack1 = [Stone P1 F, Stone P2 F, Stone P1 S]
 mockStack2 = [Stone P2 F, Stone P1 C]
@@ -37,6 +38,12 @@ testsGetHeight = TestList
 testsGetTallestHeight = TestList
   [ TestCase $ getTallestHeight [mockCell1, mockCell2] @?= 3 ]
 
+testsGetTopStone = TestList
+  [ TestCase $ getTopStone (Cell ('b', 2) []) @?= Nothing
+  , TestCase $ getTopStone (Cell ('b', 2) [Stone P1 F]) @?= Just (Stone P1 F)
+  , TestCase $ getTopStone (Cell ('b', 2) [Stone P1 F, Stone P2 C]) @?= Just (Stone P2 C)
+  ]
+
 testsGetNextXY = TestList
   [ TestCase $ getNextXY ('b', 2) North @?= ('b', 3)
   , TestCase $ getNextXY ('b', 2) East  @?= ('c', 2)
@@ -58,6 +65,8 @@ testsConversion = TestList
   , testsToStoneType
   , testsGetSize
   , testsGetHeight
+  , testsGetTallestHeight
+  , testsGetTopStone
   , testsGetNextXY
   , testsGetNextXYs
   ]
