@@ -43,9 +43,8 @@ canPlace b xy = case getCell b xy of
 capsInDeck :: Game -> Bool
 capsInDeck g = totalCaps - placedCaps > 0
   where
-    p = getPlayer g
     totalCaps = capCount $ size g
-    placedCaps = length $ getPlacedByPlayerAndType g p C
+    placedCaps = length $ getPlacedByPlayerAndType g (player g) C
 
 isBoardFull :: Board -> Bool
 isBoardFull = not . any (\(Cell _ zs) -> null zs)
@@ -64,7 +63,7 @@ isUnderControl g (_, xy, _, _) = case getCell (board g) xy of
   Nothing -> False
   Just c -> case getTopStone c of
     Nothing -> False
-    Just (Stone owner _) -> owner == getPlayer g
+    Just (Stone owner _) -> owner == player g
 
 -- F or empty cell
 isToppable :: Cell -> Bool

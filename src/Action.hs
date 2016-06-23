@@ -8,6 +8,13 @@ import Display
 import Parser
 import Validation
 
+updateGame :: Game -> Board -> Game
+updateGame g b = g { board = b, player = p, turn = t }
+  where
+    p = if player g == P1 then P2 else P1
+    -- new turn?
+    t = if p == P1 then turn g + 1 else turn g
+
 placeStone :: Board -> XY -> Stone -> Board
 placeStone b xy stone = map (stackStones xy [stone]) b
 
@@ -22,11 +29,9 @@ unstackStones xy count c@(Cell xy' zs) = if xy == xy'
   else c
 
 placeStoneInGame :: Game -> XY -> StoneType -> (Game, Display)
-placeStoneInGame g xy st = (g', showBoardWithAxes b')
+placeStoneInGame g xy st = (updateGame g b', showBoardWithAxes b')
   where
-    b = board g
-    b' = placeStone b xy (Stone (getPlayer g) st)
-    g' = g { board = b', turn = turn g + 1 }
+    b' = placeStone (board g) xy (Stone (player g) st)
 
 -- turn all stones to F
 flattenStack :: Stack -> Stack
@@ -41,12 +46,10 @@ moveSubstack b count fromXY toXY = map (stackStones toXY stones) b'
 
 -- TODO
 moveStack :: Game -> Move -> (Game, Display)
-moveStack g m@(count, xy, dir, drops) = (g', showBoardWithAxes b')
+moveStack g m@(count, xy, dir, drops) = (updateGame g b', showBoardWithAxes b')
   where
-    b = board g
     reducer acc (xy, drop) = moveSubstack acc drop xy (getNextXY xy dir)
-    b' = foldl reducer b $ zipXYandDrops m
-    g' = g { board = b', turn = turn g + 1 }
+    b' = foldl reducer (board g) $ zipXYandDrops m
 
 zipXYandDrops :: Move -> [(XY, Int)]
 zipXYandDrops m@(count, xy, dir, drops) = zip xys drops'

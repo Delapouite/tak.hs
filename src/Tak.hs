@@ -46,6 +46,7 @@ type Display = String
 
 data Game = Game { size :: Int
                  , board :: Board
+                 , player :: Player
                  , turn :: Int
                  }
 

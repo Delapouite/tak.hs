@@ -9,9 +9,6 @@ import Tak
 getSize :: Board -> Int
 getSize = truncate . sqrt . fromIntegral . length
 
-getPlayer :: Game -> Player
-getPlayer g = if turn g `mod` 2 == 0 then P2 else P1
-
 getPlacedByPlayer :: Game -> Player -> [Stone]
 getPlacedByPlayer g p = concatMap getOwnStones $ getStacks g
   where

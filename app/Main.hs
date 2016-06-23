@@ -27,7 +27,7 @@ getPrompt :: Game -> Display
 getPrompt g = "\nturn " ++ t ++ " / " ++ p ++ ">"
   where
     t = show $ turn g
-    p = show $ getPlayer g
+    p = show $ player g
 
 prompt :: String -> IO Display
 prompt q = do
@@ -51,6 +51,6 @@ promptSize = do
 main = do
   putStrLn "Welcome to Tak.hs"
   size <- promptSize
-  let g = Game { size = size, board = initBoard size, turn = 1 }
+  let g = Game { size = size, board = initBoard size, player = P1, turn = 1 }
   putStrLn $ showGame g
   loop g
