@@ -66,7 +66,7 @@ handleShow g xory = case xory of
 handlePlace :: Game -> XY -> StoneType -> (Game, Display)
 handlePlace g xy st
   | not $ isValidXY g xy          = (g, "Wrong xy coordinates")
-  | not $ canStack g xy           = (g, "The cell must be empty")
+  | not $ canPlace (board g) xy   = (g, "The cell must be empty")
   | st == C && not (capsInDeck g) = (g, "No more caps in deck")
   | otherwise                     = placeStoneInGame g xy st
 

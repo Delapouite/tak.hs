@@ -35,8 +35,8 @@ isValidDrops :: Int -> Drops -> Bool
 isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
 
 -- only in empty cells
-canStack :: Game -> XY -> Bool
-canStack g xy = case getCell (board g) xy of
+canPlace :: Board -> XY -> Bool
+canPlace b xy = case getCell b xy of
   Just (Cell _ zs) -> null zs
   Nothing -> False
 
