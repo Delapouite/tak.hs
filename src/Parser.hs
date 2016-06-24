@@ -59,12 +59,22 @@ parseDrops c str = case reads str :: [(Int, String)] of
   [] -> c
 
 -- [TPS "x3,12,2S/x,22S,22C,11,21/121,212,12,1121C,1212S/21S,1,21,211S,12S/x,21S,2,x2 1 26"]
+parseTPS :: String -> Game
+parseTPS tps = Game { size = getSize b', board = b', player = p', turn = read t }
+  where
+    [_, g, _] = splitOn "\"" tps
+    [b, p, t] = splitOn " " g
+    b' = parseTPSBoard b
+    p' = toPlayer p
+
 parseTPSBoard :: String -> Board
 parseTPSBoard tps = concat [parseTPSRow r y | (r, y) <- z]
   where
     tpsRows = splitOn "/" tps
     z = zip tpsRows $ reverse [1..(length tpsRows)]
 
+-- x5
+-- x3,12,2S
 parseTPSRow :: String -> Y -> Row
 parseTPSRow tps y = cells
   where
@@ -72,6 +82,7 @@ parseTPSRow tps y = cells
     tpsCell =  splitOn "," tpsRow
     cells = [parseTPSCell c (x, y) | (c, x) <- zip tpsCell $ take (length tpsCell) xs]
 
+-- x5 → x,x,x,x,x
 parseTPSX :: String -> String
 parseTPSX ['x', n] = intersperse ',' $ replicate (digitToInt n) 'x'
 parseTPSX tps = tps
