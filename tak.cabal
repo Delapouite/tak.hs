@@ -20,6 +20,7 @@ library
                      , Conversion
                      , Display
                      , Parser
+                     , TPS
                      , Validation
   build-depends:       base >= 4.7 && < 5
                      , split
@@ -47,6 +48,7 @@ test-suite tak-test
   other-modules:       ActionSpec
                      , ConversionSpec
                      , ParserSpec
+                     , TPSSpec
                      , ValidationSpec
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
