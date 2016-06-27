@@ -29,8 +29,8 @@ getStacks g = map (\(Cell _ zs) -> zs) $ board g
 getHeight :: Cell -> Int
 getHeight (Cell _ zs) = length zs
 
-getTallestHeight :: [Cell] -> Int
-getTallestHeight cells = maximum $ map getHeight cells
+getMaxHeight :: [Cell] -> Int
+getMaxHeight cells = maximum $ map getHeight cells
 
 -- TODO maybeLast?
 getTopStone :: Cell -> Maybe Stone

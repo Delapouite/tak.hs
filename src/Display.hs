@@ -35,7 +35,7 @@ showStackLevel cs i = unwords stones
 showStacks :: [Cell] -> Display
 showStacks cs = unlines $ map (showStackLevel cs) levels
   where
-    levels = reverse [0..getTallestHeight cs - 1]
+    levels = reverse [0..getMaxHeight cs - 1]
 
 showCol :: Board -> X -> Display
 showCol b x = col ++ showYAxis b

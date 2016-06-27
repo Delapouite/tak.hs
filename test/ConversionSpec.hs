@@ -35,8 +35,8 @@ testsGetHeight = TestList
   , TestCase $ getHeight mockCell2 @?= 2
   ]
 
-testsGetTallestHeight = TestList
-  [ TestCase $ getTallestHeight [mockCell1, mockCell2] @?= 3 ]
+testsGetMaxHeight = TestList
+  [ TestCase $ getMaxHeight [mockCell1, mockCell2] @?= 3 ]
 
 testsGetTopStone = TestList
   [ TestCase $ getTopStone (Cell ('b', 2) []) @?= Nothing
@@ -65,7 +65,7 @@ testsConversion = TestList
   , testsToStoneType
   , testsGetSize
   , testsGetHeight
-  , testsGetTallestHeight
+  , testsGetMaxHeight
   , testsGetTopStone
   , testsGetNextXY
   , testsGetNextXYs
