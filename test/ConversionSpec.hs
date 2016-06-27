@@ -89,6 +89,22 @@ testsGetNeighbors = TestList
     ]
   ]
 
+testsGetCol = TestList
+  [ TestCase $ getCol mockBoard 'a' @?=
+    [ Cell ('a', 1) []
+    , Cell ('a', 2) []
+    , Cell ('a', 3) []
+    ]
+  ]
+
+testsGetRow = TestList
+  [ TestCase $ getRow mockBoard 2 @?=
+    [ Cell ('a', 2) []
+    , Cell ('b', 2) []
+    , Cell ('c', 2) []
+    ]
+  ]
+
 testsConversion = TestList
   [ testsXtoInt
   , testsToXorY
@@ -100,4 +116,6 @@ testsConversion = TestList
   , testsGetNextXY
   , testsGetNextXYs
   , testsGetNeighbors
+  , testsGetCol
+  , testsGetRow
   ]

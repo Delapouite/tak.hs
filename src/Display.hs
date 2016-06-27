@@ -40,14 +40,12 @@ showStacks cs = unlines $ map (showStackLevel cs) levels
 showCol :: Board -> X -> Display
 showCol b x = col ++ showYAxis b
   where
-    cols = toCols b
-    col = showStacks . reverse $ cols !! xToInt x
+    col = showStacks . reverse $ getCol b x
 
 showRow :: Board -> Y -> Display
 showRow b y = row ++ showXAxis b
   where
-    rows = toRows b
-    row = showStacks $ rows !! (y - 1)
+    row = showStacks $ getRow b y
 
 showBoardWithYAxis :: Board -> Display
 showBoardWithYAxis = unlines . reverse . map showRowWithY . toRows

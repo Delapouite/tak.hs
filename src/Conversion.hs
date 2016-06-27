@@ -64,6 +64,12 @@ getNeighbors b xy = cells
     mCells = map (getCell b) xys
     cells = map fromJust $ filter isJust mCells
 
+getCol :: Board -> X -> Col
+getCol b x = toCols b !! xToInt x
+
+getRow :: Board -> Y -> Row
+getRow b y = toRows b !! (y - 1)
+
 -- 97 = ASCII 'a'
 xToInt :: X -> Int
 xToInt x = ord x - 97
