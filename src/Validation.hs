@@ -34,10 +34,13 @@ isValidCount g (count, xy, _, _) =
 isValidDrops :: Count -> Drops -> Bool
 isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
 
+isEmpty :: Cell -> Bool
+isEmpty (Cell _ zs) = null zs
+
 -- only in empty cells
 canPlace :: Board -> XY -> Bool
 canPlace b xy = case getCell b xy of
-  Just (Cell _ zs) -> null zs
+  Just c -> isEmpty c
   Nothing -> False
 
 capsInDeck :: Game -> Bool
@@ -47,7 +50,7 @@ capsInDeck g = totalCaps - placedCaps > 0
     placedCaps = length $ getPlacedByPlayerAndType g (player g) C
 
 isBoardFull :: Board -> Bool
-isBoardFull = not . any (\(Cell _ zs) -> null zs)
+isBoardFull = not . any isEmpty
 
 checkEnd :: Game -> Maybe Display
 checkEnd g = if isBoardFull $ board g

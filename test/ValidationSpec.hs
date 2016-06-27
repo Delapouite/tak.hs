@@ -12,6 +12,11 @@ testsIsValidDrops = TestList
   , TestCase $ isValidDrops 4 122 @?= False
   ]
 
+testsIsEmpty = TestList
+  [ TestCase $ isEmpty (Cell ('a', 1) []) @?= True
+  , TestCase $ isEmpty (Cell ('a', 1) [Stone P1 F]) @?= False
+  ]
+
 testsCanPlace = TestList
   [ TestCase $ True @=? canPlace
      [ Cell ('a', 1) []
@@ -73,6 +78,7 @@ testsHasCap = TestList
 
 testsValidation = TestList
   [ testsIsValidDrops
+  , testsIsEmpty
   , testsCanPlace
   , testsIsBoardFull
   , testsIsToppable
