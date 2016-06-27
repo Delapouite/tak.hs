@@ -3,6 +3,7 @@ module Conversion where
 import Data.Char (isDigit, ord, toUpper)
 import Data.List (find, transpose)
 import Data.List.Split (chunksOf)
+import Data.Maybe (fromJust, isJust)
 
 import Tak
 
@@ -54,6 +55,14 @@ getNextXYs xy dir drops = tail $ foldl red [xy] (show drops)
 
 getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
 getNextCells b (Cell xy _) dir drops = map (getCell b) $ getNextXYs xy dir drops
+
+-- up to 4, in each direction
+getNeighbors :: Board -> XY -> [Cell]
+getNeighbors b xy = cells
+  where
+    xys = map (getNextXY xy) [North, East, South, West]
+    mCells = map (getCell b) xys
+    cells = map fromJust $ filter isJust mCells
 
 -- 97 = ASCII 'a'
 xToInt :: X -> Int

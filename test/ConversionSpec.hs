@@ -12,6 +12,18 @@ mockStack2 = [Stone P2 F, Stone P1 C]
 mockCell1 = Cell ('b', 3) mockStack1
 mockCell2 = Cell ('c', 4) mockStack2
 
+mockBoard =
+  [ Cell ('a', 1) []
+  , Cell ('a', 2) []
+  , Cell ('a', 3) []
+  , Cell ('b', 1) []
+  , Cell ('b', 2) []
+  , Cell ('b', 3) []
+  , Cell ('c', 1) []
+  , Cell ('c', 2) []
+  , Cell ('c', 3) []
+  ]
+
 testsXtoInt = TestList
   [ TestCase $ xToInt 'c' @?= 2 ]
 
@@ -59,6 +71,24 @@ testsGetNextXYs = TestList
   , TestCase $ getNextXYs ('b', 2) North 212 @?= [('b', 3), ('b', 4), ('b', 5)]
   ]
 
+testsGetNeighbors = TestList
+  [ TestCase $ getNeighbors mockBoard ('a', 1) @?=
+    [ Cell ('a', 2) []
+    , Cell ('b', 1) []
+    ]
+  , TestCase $ getNeighbors mockBoard ('b', 1) @?=
+    [ Cell ('b', 2) []
+    , Cell ('c', 1) []
+    , Cell ('a', 1) []
+    ]
+  , TestCase $ getNeighbors mockBoard ('b', 2) @?=
+    [ Cell ('b', 3) []
+    , Cell ('c', 2) []
+    , Cell ('b', 1) []
+    , Cell ('a', 2) []
+    ]
+  ]
+
 testsConversion = TestList
   [ testsXtoInt
   , testsToXorY
@@ -69,4 +99,5 @@ testsConversion = TestList
   , testsGetTopStone
   , testsGetNextXY
   , testsGetNextXYs
+  , testsGetNeighbors
   ]
