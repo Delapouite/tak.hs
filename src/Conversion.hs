@@ -69,6 +69,14 @@ getNeighbors b xy = cells
     mCells = map (getCell b) xys
     cells = map fromJust $ filter isJust mCells
 
+-- neighbors owned by same player
+getValidNeighbors :: Board -> XY -> [Cell]
+getValidNeighbors b xy = case getCell b xy of
+  Nothing -> []
+  Just cell -> case getOwner cell of
+    Nothing -> []
+    Just owner -> filter (\c -> getOwner c == Just owner) $ getNeighbors b xy
+
 getCol :: Board -> X -> Col
 getCol b x = toCols b !! xToInt x
 

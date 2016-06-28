@@ -6,19 +6,24 @@ import Tak
 import Conversion
 import Display
 
-mockStack1 = [Stone P1 F, Stone P2 F, Stone P1 S]
-mockStack2 = [Stone P2 F, Stone P1 C]
+mockStackS1 = [Stone P1 F, Stone P2 F, Stone P1 S]
+mockStackC1 = [Stone P2 F, Stone P1 C]
+mockStackF2 = [Stone P2 F]
 
-mockCell1 = Cell ('b', 3) mockStack1
-mockCell2 = Cell ('c', 4) mockStack2
+mockCellA1 = Cell ('a', 1) mockStackS1
+mockCellA2 = Cell ('a', 2) mockStackS1
+mockCellA3 = Cell ('a', 3) mockStackF2
+mockCellB3 = Cell ('b', 3) mockStackS1
+mockCellC4 = Cell ('c', 4) mockStackC1
 
 mockBoard =
-  [ Cell ('a', 1) []
-  , Cell ('a', 2) []
-  , Cell ('a', 3) []
+
+  [ mockCellA1
+  , mockCellA2
+  , mockCellA3
   , Cell ('b', 1) []
   , Cell ('b', 2) []
-  , Cell ('b', 3) []
+  , mockCellB3
   , Cell ('c', 1) []
   , Cell ('c', 2) []
   , Cell ('c', 3) []
@@ -43,12 +48,12 @@ testsGetSize = TestCase $ assertEqual "Should return side length of the Board" e
     act = getSize $ initBoard exp
 
 testsGetHeight = TestList
-  [ TestCase $ getHeight mockCell1 @?= 3
-  , TestCase $ getHeight mockCell2 @?= 2
+  [ TestCase $ getHeight mockCellB3 @?= 3
+  , TestCase $ getHeight mockCellC4 @?= 2
   ]
 
 testsGetMaxHeight = TestList
-  [ TestCase $ getMaxHeight [mockCell1, mockCell2] @?= 3 ]
+  [ TestCase $ getMaxHeight [mockCellB3, mockCellC4] @?= 3 ]
 
 testsGetTopStone = TestList
   [ TestCase $ getTopStone (Cell ('b', 2) []) @?= Nothing
@@ -79,33 +84,40 @@ testsGetNextXYs = TestList
 
 testsGetNeighbors = TestList
   [ TestCase $ getNeighbors mockBoard ('a', 1) @?=
-    [ Cell ('a', 2) []
+    [ mockCellA2
     , Cell ('b', 1) []
     ]
   , TestCase $ getNeighbors mockBoard ('b', 1) @?=
     [ Cell ('b', 2) []
     , Cell ('c', 1) []
-    , Cell ('a', 1) []
+    , mockCellA1
     ]
   , TestCase $ getNeighbors mockBoard ('b', 2) @?=
-    [ Cell ('b', 3) []
+    [ mockCellB3
     , Cell ('c', 2) []
     , Cell ('b', 1) []
-    , Cell ('a', 2) []
+    , mockCellA2
     ]
+  ]
+
+testsGetValidNeighbors = TestList
+  [ TestCase $ getValidNeighbors mockBoard ('a', 1) @?= [ mockCellA2 ]
+  , TestCase $ getValidNeighbors mockBoard ('b', 1) @?= []
+  , TestCase $ getValidNeighbors mockBoard ('b', 3) @?= []
+  , TestCase $ getValidNeighbors mockBoard ('b', 6) @?= []
   ]
 
 testsGetCol = TestList
   [ TestCase $ getCol mockBoard 'a' @?=
-    [ Cell ('a', 1) []
-    , Cell ('a', 2) []
-    , Cell ('a', 3) []
+    [ mockCellA1
+    , mockCellA2
+    , mockCellA3
     ]
   ]
 
 testsGetRow = TestList
   [ TestCase $ getRow mockBoard 2 @?=
-    [ Cell ('a', 2) []
+    [ mockCellA2
     , Cell ('b', 2) []
     , Cell ('c', 2) []
     ]
@@ -123,6 +135,7 @@ testsConversion = TestList
   , testsGetNextXY
   , testsGetNextXYs
   , testsGetNeighbors
+  , testsGetValidNeighbors
   , testsGetCol
   , testsGetRow
   ]
