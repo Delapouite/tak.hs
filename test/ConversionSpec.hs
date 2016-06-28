@@ -56,6 +56,12 @@ testsGetTopStone = TestList
   , TestCase $ getTopStone (Cell ('b', 2) [Stone P1 F, Stone P2 C]) @?= Just (Stone P2 C)
   ]
 
+testsGetOwner = TestList
+  [ TestCase $ getOwner (Cell ('b', 2) []) @?= Nothing
+  , TestCase $ getOwner (Cell ('b', 2) [Stone P1 F]) @?= Just P1
+  , TestCase $ getOwner (Cell ('b', 2) [Stone P1 F, Stone P2 S]) @?= Just P2
+  ]
+
 testsGetNextXY = TestList
   [ TestCase $ getNextXY ('b', 2) North @?= ('b', 3)
   , TestCase $ getNextXY ('b', 2) East  @?= ('c', 2)
@@ -113,6 +119,7 @@ testsConversion = TestList
   , testsGetHeight
   , testsGetMaxHeight
   , testsGetTopStone
+  , testsGetOwner
   , testsGetNextXY
   , testsGetNextXYs
   , testsGetNeighbors

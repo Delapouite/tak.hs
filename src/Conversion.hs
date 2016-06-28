@@ -39,6 +39,11 @@ getTopStone (Cell _ zs)
   | null zs   = Nothing
   | otherwise = Just $ last zs
 
+getOwner :: Cell -> Maybe Player
+getOwner c = case getTopStone c of
+  Nothing -> Nothing
+  Just (Stone owner _) -> Just owner
+
 -- beware resulting XY can be out of bounds
 getNextXY :: XY -> Dir -> XY
 getNextXY (x, y) d = case d of
