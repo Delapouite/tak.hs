@@ -123,6 +123,9 @@ testsGetRow = TestList
     ]
   ]
 
+testsGetMaxX = TestList
+  [ TestCase $ getMaxX mockBoard @?= 'c' ]
+
 testsConversion = TestList
   [ testsXtoInt
   , testsToXorY
@@ -138,4 +141,5 @@ testsConversion = TestList
   , testsGetValidNeighbors
   , testsGetCol
   , testsGetRow
+  , testsGetMaxX
   ]

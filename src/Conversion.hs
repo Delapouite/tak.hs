@@ -83,6 +83,9 @@ getCol b x = toCols b !! xToInt x
 getRow :: Board -> Y -> Row
 getRow b y = toRows b !! (y - 1)
 
+getMaxX :: Board -> X
+getMaxX b = xs !! (getSize b - 1)
+
 -- 97 = ASCII 'a'
 xToInt :: X -> Int
 xToInt x = ord x - 97
