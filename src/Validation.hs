@@ -97,12 +97,12 @@ checkEnd g = if isBoardFull b
     p2FlatsCount = length $ getPlacedByPlayerAndType b P2 F
     winner = if p1FlatsCount > p2FlatsCount then P1 else P2
 
-isUnderControl :: Game -> Move -> Bool
-isUnderControl g (_, xy, _, _) = case getCell (board g) xy of
+isUnderControl :: Game -> XY -> Bool
+isUnderControl g xy = case getCell (board g) xy of
   Nothing -> False
-  Just c -> case getTopStone c of
+  Just c -> case getOwner c of
     Nothing -> False
-    Just (Stone owner _) -> owner == player g
+    Just owner -> owner == player g
 
 isDropzoneClear :: Game -> Move -> Bool
 isDropzoneClear g (count, xy, dir, drops) = clear

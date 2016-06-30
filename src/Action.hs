@@ -76,7 +76,7 @@ handlePlace g xy st
 handleMove :: Game -> Move -> (Game, Display)
 handleMove g m@(count, xy, dir, drops)
   | not $ isValidXY g xy           = (g, "Wrong xy coordinates")
-  | not $ isUnderControl g m       = (g, "You do not control the cell")
+  | not $ isUnderControl g xy      = (g, "You do not control the cell")
   | not $ isValidCount g m         = (g, "Wrong count")
   | not $ isValidDrops count drops = (g, "Wrong drops")
   | not $ isDropzoneClear g m      = (g, "The dropzone is not clear")
