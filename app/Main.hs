@@ -7,6 +7,7 @@ import System.IO (hFlush, stdout)
 
 import Tak
 import Action
+import Board
 import Cell
 import Conversion
 import Display

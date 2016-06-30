@@ -5,6 +5,7 @@ import Data.Maybe (mapMaybe, isJust, fromJust)
 import Data.List (nub)
 
 import Tak
+import Board
 import Cell
 import Conversion
 

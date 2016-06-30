@@ -3,6 +3,7 @@ module Action where
 import Data.Char (digitToInt)
 
 import Tak
+import Board
 import Conversion
 import Display
 import Parser

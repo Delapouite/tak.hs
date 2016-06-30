@@ -1,6 +1,7 @@
 module Display where
 
 import Tak
+import Board
 import Conversion
 
 instance Show Stone where
