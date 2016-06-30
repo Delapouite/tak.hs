@@ -1,7 +1,8 @@
 module Validation where
 
 import Data.Char (digitToInt)
-import Data.Maybe (isJust, fromJust)
+import Data.Maybe (mapMaybe, isJust, fromJust)
+import Data.List (nub)
 
 import Tak
 import Conversion
@@ -37,6 +38,9 @@ isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
 isEmpty :: Cell -> Bool
 isEmpty (Cell _ zs) = null zs
 
+getOwned :: [Cell] -> [Cell]
+getOwned = filter (not . isEmpty)
+
 -- only in empty cells
 canPlace :: Board -> XY -> Bool
 canPlace b xy = case getCell b xy of
@@ -52,10 +56,40 @@ capsInDeck g = totalCaps - placedCaps > 0
 isBoardFull :: Board -> Bool
 isBoardFull = not . any isEmpty
 
+checkRoad :: Board -> (Cell -> Bool) -> [Cell] -> Cell -> Bool
+checkRoad b isEnd visited c@(Cell xy _) =
+  isEnd c || any (checkRoad b isEnd (c:visited)) newNeighbors
+  where
+    newNeighbors = filter (`notElem` visited) $ getValidNeighbors b xy
+
+checkHalfRoads :: Board -> (Cell -> Bool) -> [Cell] -> [Player]
+checkHalfRoads b isEnd starts = nub $ mapMaybe roadOwner starts
+  where
+    roadOwner c = if checkRoad b isEnd starts c
+      then getOwner c
+      else Nothing
+
+checkRoads :: Game -> Maybe Display
+checkRoads g = if not $ null roadOwners
+  then Just ("Road(s) completed by: " ++ show roadOwners)
+  else Nothing
+  where
+    b = board g
+    -- horizontal (West → East): col a → col maxX
+    hStarts = getOwned $ getCol b 'a'
+    hIsEnd (Cell (x, _) _) = x == getMaxX b
+    hRoadOwners = checkHalfRoads b hIsEnd hStarts
+    -- vertical (South → North): row 1 → row maxY
+    vStarts = getOwned $ getRow b 1
+    vIsEnd (Cell (_, y) _) = y == size g
+    vRoadOwners = checkHalfRoads b vIsEnd vStarts
+
+    roadOwners = nub $ hRoadOwners ++ vRoadOwners
+
 checkEnd :: Game -> Maybe Display
 checkEnd g = if isBoardFull $ board g
   then Just ("Board's full! Flat winner is " ++ show winner)
-  else Nothing
+  else checkRoads g
   where
     p1FlatsCount = length $ getPlacedByPlayerAndType g P1 F
     p2FlatsCount = length $ getPlacedByPlayerAndType g P2 F
