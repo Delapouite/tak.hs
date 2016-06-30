@@ -52,6 +52,15 @@ testsIsToppable = TestList
   , TestCase $ isToppable (Cell ('a', 1) [Stone P1 C]) @?= False
   ]
 
+testsIsFlattenable = TestList
+  [ TestCase $ isFlattenable (Cell ('a', 1) []) 1 @?= False
+  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 F]) 1 @?= False
+  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 C]) 1 @?= False
+  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 S]) 2 @?= False
+  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 S]) 1 @?= True
+  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 S]) 111 @?= True
+  ]
+
 testsCell = TestList
   [ testsGetHeight
   , testsGetTopStone
@@ -59,4 +68,5 @@ testsCell = TestList
   , testsHasCap
   , testsIsEmpty
   , testsIsToppable
+  , testsIsFlattenable
   ]

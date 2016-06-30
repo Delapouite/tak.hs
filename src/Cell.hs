@@ -5,16 +5,16 @@ import Tak
 getHeight :: Cell -> Int
 getHeight (Cell _ zs) = length zs
 
+getOwner :: Cell -> Maybe Player
+getOwner c = case getTopStone c of
+  Nothing -> Nothing
+  Just (Stone owner _) -> Just owner
+
 -- TODO maybeLast?
 getTopStone :: Cell -> Maybe Stone
 getTopStone (Cell _ zs)
   | null zs   = Nothing
   | otherwise = Just $ last zs
-
-getOwner :: Cell -> Maybe Player
-getOwner c = case getTopStone c of
-  Nothing -> Nothing
-  Just (Stone owner _) -> Just owner
 
 -- C on top of stack
 hasCap :: Cell -> Bool
