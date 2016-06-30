@@ -16,9 +16,6 @@ getPlacedByPlayer g p = concatMap getOwnStones $ getStacks (board g)
   where
     getOwnStones = filter (\(Stone owner _) -> owner == p)
 
-getPlaced :: Game -> [Stone]
-getPlaced g = getPlacedByPlayer g P1 ++ getPlacedByPlayer g P2
-
 getPlacedByPlayerAndType :: Game -> Player -> StoneType -> [Stone]
 getPlacedByPlayerAndType g p st = filter (\(Stone _ t) -> t == st) $ getPlacedByPlayer g p
 
