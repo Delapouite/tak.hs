@@ -14,34 +14,22 @@ getCell b xy = find (\(Cell xy' _) -> xy == xy') b
 getCol :: Board -> X -> Col
 getCol b x = toCols b !! xToInt x
 
+getMaxHeight :: [Cell] -> Int
+getMaxHeight cells = maximum $ map getHeight cells
+
 getMaxX :: Board -> X
 getMaxX b = xs !! (getSize b - 1)
 
-getRow :: Board -> Y -> Row
-getRow b y = toRows b !! (y - 1)
-
-getSize :: Board -> Int
-getSize = truncate . sqrt . fromIntegral . length
-
-getStacks :: Board -> [Stack]
-getStacks = map (\(Cell _ zs) -> zs)
-
-toCols :: Board -> [Col]
-toCols b = chunksOf (getSize b) b
-
-toRows :: Board -> [Row]
-toRows = transpose . toCols
-
-getPlacedByPlayer :: Board -> Player -> [Stone]
-getPlacedByPlayer b p = concatMap getOwnStones $ getStacks b
+-- up to 4, in each direction
+getNeighbors :: Board -> XY -> [Cell]
+getNeighbors b xy = cells
   where
-    getOwnStones = filter (\(Stone owner _) -> owner == p)
+    xys = map (getNextXY xy) [North, East, South, West]
+    mCells = map (getCell b) xys
+    cells = map fromJust $ filter isJust mCells
 
-getPlacedByPlayerAndType :: Board -> Player -> StoneType -> [Stone]
-getPlacedByPlayerAndType b p st = filter (\(Stone _ t) -> t == st) $ getPlacedByPlayer b p
-
-getMaxHeight :: [Cell] -> Int
-getMaxHeight cells = maximum $ map getHeight cells
+getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
+getNextCells b (Cell xy _) dir drops = map (getCell b) $ getNextXYs xy dir drops
 
 -- beware resulting XY can be out of bounds
 getNextXY :: XY -> Dir -> XY
@@ -57,16 +45,25 @@ getNextXYs xy dir drops = tail $ foldl red [xy] (show drops)
   where
     red acc _ = acc ++ [getNextXY (last acc) dir]
 
-getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
-getNextCells b (Cell xy _) dir drops = map (getCell b) $ getNextXYs xy dir drops
+getOwned :: [Cell] -> [Cell]
+getOwned = filter (not . isEmpty)
 
--- up to 4, in each direction
-getNeighbors :: Board -> XY -> [Cell]
-getNeighbors b xy = cells
+getPlacedByPlayer :: Board -> Player -> [Stone]
+getPlacedByPlayer b p = concatMap getOwnStones $ getStacks b
   where
-    xys = map (getNextXY xy) [North, East, South, West]
-    mCells = map (getCell b) xys
-    cells = map fromJust $ filter isJust mCells
+    getOwnStones = filter (\(Stone owner _) -> owner == p)
+
+getPlacedByPlayerAndType :: Board -> Player -> StoneType -> [Stone]
+getPlacedByPlayerAndType b p st = filter (\(Stone _ t) -> t == st) $ getPlacedByPlayer b p
+
+getRow :: Board -> Y -> Row
+getRow b y = toRows b !! (y - 1)
+
+getSize :: Board -> Int
+getSize = truncate . sqrt . fromIntegral . length
+
+getStacks :: Board -> [Stack]
+getStacks = map (\(Cell _ zs) -> zs)
 
 -- neighbors owned by same player
 getValidNeighbors :: Board -> XY -> [Cell]
@@ -75,3 +72,12 @@ getValidNeighbors b xy = case getCell b xy of
   Just cell -> case getOwner cell of
     Nothing -> []
     Just owner -> filter (\c -> getOwner c == Just owner) $ getNeighbors b xy
+
+isBoardFull :: Board -> Bool
+isBoardFull = not . any isEmpty
+
+toCols :: Board -> [Col]
+toCols b = chunksOf (getSize b) b
+
+toRows :: Board -> [Row]
+toRows = transpose . toCols

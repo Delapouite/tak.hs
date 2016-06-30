@@ -39,9 +39,6 @@ isValidCount g (count, xy, _, _) =
 isValidDrops :: Count -> Drops -> Bool
 isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
 
-getOwned :: [Cell] -> [Cell]
-getOwned = filter (not . isEmpty)
-
 -- only in empty cells
 canPlace :: Board -> XY -> Bool
 canPlace b xy = case getCell b xy of
@@ -53,9 +50,6 @@ capsInDeck g = totalCaps - placedCaps > 0
   where
     totalCaps = capCount $ size g
     placedCaps = length $ getPlacedByPlayerAndType (board g) (player g) C
-
-isBoardFull :: Board -> Bool
-isBoardFull = not . any isEmpty
 
 checkRoad :: Board -> (Cell -> Bool) -> [Cell] -> Cell -> Bool
 checkRoad b isEnd visited c@(Cell xy _) =

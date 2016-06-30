@@ -29,27 +29,6 @@ testsCanPlace = TestList
      ('a', 2)
   ]
 
-testsIsBoardFull = TestList
-  [ TestCase $ False @=? isBoardFull
-     [ Cell ('a', 1) []
-     , Cell ('a', 2) []
-     , Cell ('b', 1) []
-     , Cell ('b', 2) []
-     ]
-  , TestCase $ False @=? isBoardFull
-     [ Cell ('a', 1) [Stone P1 F]
-     , Cell ('a', 2) []
-     , Cell ('b', 1) [Stone P2 C]
-     , Cell ('b', 2) []
-     ]
-  , TestCase $ True @=? isBoardFull
-     [ Cell ('a', 1) [Stone P1 F]
-     , Cell ('a', 2) [Stone P1 F]
-     , Cell ('b', 1) [Stone P2 C]
-     , Cell ('b', 2) [Stone P2 S]
-     ]
-  ]
-
 testsIsValidDrops = TestList
   [ TestCase $ isValidDrops 3 3 @?= True
   , TestCase $ isValidDrops 4 3 @?= False
@@ -59,6 +38,5 @@ testsIsValidDrops = TestList
 
 testsValidation = TestList
   [ testsCanPlace
-  , testsIsBoardFull
   , testsIsValidDrops
   ]
