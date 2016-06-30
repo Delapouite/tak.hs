@@ -12,7 +12,7 @@ getSize :: Board -> Int
 getSize = truncate . sqrt . fromIntegral . length
 
 getPlacedByPlayer :: Game -> Player -> [Stone]
-getPlacedByPlayer g p = concatMap getOwnStones $ getStacks g
+getPlacedByPlayer g p = concatMap getOwnStones $ getStacks (board g)
   where
     getOwnStones = filter (\(Stone owner _) -> owner == p)
 
@@ -25,8 +25,8 @@ getPlacedByPlayerAndType g p st = filter (\(Stone _ t) -> t == st) $ getPlacedBy
 getCell :: Board -> XY -> Maybe Cell
 getCell b xy = find (\(Cell xy' _) -> xy == xy') b
 
-getStacks :: Game -> [Stack]
-getStacks g = map (\(Cell _ zs) -> zs) $ board g
+getStacks :: Board -> [Stack]
+getStacks = map (\(Cell _ zs) -> zs)
 
 getMaxHeight :: [Cell] -> Int
 getMaxHeight cells = maximum $ map getHeight cells
