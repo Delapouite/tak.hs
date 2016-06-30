@@ -11,13 +11,13 @@ import Cell
 getSize :: Board -> Int
 getSize = truncate . sqrt . fromIntegral . length
 
-getPlacedByPlayer :: Game -> Player -> [Stone]
-getPlacedByPlayer g p = concatMap getOwnStones $ getStacks (board g)
+getPlacedByPlayer :: Board -> Player -> [Stone]
+getPlacedByPlayer b p = concatMap getOwnStones $ getStacks b
   where
     getOwnStones = filter (\(Stone owner _) -> owner == p)
 
-getPlacedByPlayerAndType :: Game -> Player -> StoneType -> [Stone]
-getPlacedByPlayerAndType g p st = filter (\(Stone _ t) -> t == st) $ getPlacedByPlayer g p
+getPlacedByPlayerAndType :: Board -> Player -> StoneType -> [Stone]
+getPlacedByPlayerAndType b p st = filter (\(Stone _ t) -> t == st) $ getPlacedByPlayer b p
 
 getCell :: Board -> XY -> Maybe Cell
 getCell b xy = find (\(Cell xy' _) -> xy == xy') b

@@ -51,7 +51,7 @@ capsInDeck :: Game -> Bool
 capsInDeck g = totalCaps - placedCaps > 0
   where
     totalCaps = capCount $ size g
-    placedCaps = length $ getPlacedByPlayerAndType g (player g) C
+    placedCaps = length $ getPlacedByPlayerAndType (board g) (player g) C
 
 isBoardFull :: Board -> Bool
 isBoardFull = not . any isEmpty
@@ -87,12 +87,13 @@ checkRoads g = if not $ null roadOwners
     roadOwners = nub $ hRoadOwners ++ vRoadOwners
 
 checkEnd :: Game -> Maybe Display
-checkEnd g = if isBoardFull $ board g
+checkEnd g = if isBoardFull b
   then Just ("Board's full! Flat winner is " ++ show winner)
   else checkRoads g
   where
-    p1FlatsCount = length $ getPlacedByPlayerAndType g P1 F
-    p2FlatsCount = length $ getPlacedByPlayerAndType g P2 F
+    b = board g
+    p1FlatsCount = length $ getPlacedByPlayerAndType b P1 F
+    p2FlatsCount = length $ getPlacedByPlayerAndType b P2 F
     winner = if p1FlatsCount > p2FlatsCount then P1 else P2
 
 isUnderControl :: Game -> Move -> Bool
