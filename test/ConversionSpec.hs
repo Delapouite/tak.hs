@@ -47,25 +47,8 @@ testsGetSize = TestCase $ assertEqual "Should return side length of the Board" e
     exp = 5
     act = getSize $ initBoard exp
 
-testsGetHeight = TestList
-  [ TestCase $ getHeight mockCellB3 @?= 3
-  , TestCase $ getHeight mockCellC4 @?= 2
-  ]
-
 testsGetMaxHeight = TestList
   [ TestCase $ getMaxHeight [mockCellB3, mockCellC4] @?= 3 ]
-
-testsGetTopStone = TestList
-  [ TestCase $ getTopStone (Cell ('b', 2) []) @?= Nothing
-  , TestCase $ getTopStone (Cell ('b', 2) [Stone P1 F]) @?= Just (Stone P1 F)
-  , TestCase $ getTopStone (Cell ('b', 2) [Stone P1 F, Stone P2 C]) @?= Just (Stone P2 C)
-  ]
-
-testsGetOwner = TestList
-  [ TestCase $ getOwner (Cell ('b', 2) []) @?= Nothing
-  , TestCase $ getOwner (Cell ('b', 2) [Stone P1 F]) @?= Just P1
-  , TestCase $ getOwner (Cell ('b', 2) [Stone P1 F, Stone P2 S]) @?= Just P2
-  ]
 
 testsGetNextXY = TestList
   [ TestCase $ getNextXY ('b', 2) North @?= ('b', 3)
@@ -131,10 +114,7 @@ testsConversion = TestList
   , testsToXorY
   , testsToStoneType
   , testsGetSize
-  , testsGetHeight
   , testsGetMaxHeight
-  , testsGetTopStone
-  , testsGetOwner
   , testsGetNextXY
   , testsGetNextXYs
   , testsGetNeighbors

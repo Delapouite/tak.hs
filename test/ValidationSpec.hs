@@ -5,18 +5,6 @@ import Test.HUnit
 import Tak
 import Validation
 
-testsIsValidDrops = TestList
-  [ TestCase $ isValidDrops 3 3 @?= True
-  , TestCase $ isValidDrops 4 3 @?= False
-  , TestCase $ isValidDrops 4 121 @?= True
-  , TestCase $ isValidDrops 4 122 @?= False
-  ]
-
-testsIsEmpty = TestList
-  [ TestCase $ isEmpty (Cell ('a', 1) []) @?= True
-  , TestCase $ isEmpty (Cell ('a', 1) [Stone P1 F]) @?= False
-  ]
-
 testsCanPlace = TestList
   [ TestCase $ True @=? canPlace
      [ Cell ('a', 1) []
@@ -62,25 +50,15 @@ testsIsBoardFull = TestList
      ]
   ]
 
-testsIsToppable = TestList
-  [ TestCase $ isToppable (Cell ('a', 1) []) @?= True
-  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 F]) @?= True
-  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 F, Stone P1 F]) @?= True
-  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 S]) @?= False
-  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 C]) @?= False
-  ]
-
-testsHasCap = TestList
-  [ TestCase $ hasCap (Cell ('a', 1) []) @?= False
-  , TestCase $ hasCap (Cell ('a', 1) [Stone P1 S]) @?= False
-  , TestCase $ hasCap (Cell ('a', 1) [Stone P1 C]) @?= True
+testsIsValidDrops = TestList
+  [ TestCase $ isValidDrops 3 3 @?= True
+  , TestCase $ isValidDrops 4 3 @?= False
+  , TestCase $ isValidDrops 4 121 @?= True
+  , TestCase $ isValidDrops 4 122 @?= False
   ]
 
 testsValidation = TestList
-  [ testsIsValidDrops
-  , testsIsEmpty
-  , testsCanPlace
+  [ testsCanPlace
   , testsIsBoardFull
-  , testsIsToppable
-  , testsHasCap
+  , testsIsValidDrops
   ]

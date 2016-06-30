@@ -5,7 +5,10 @@ import Data.Maybe (mapMaybe, isJust, fromJust)
 import Data.List (nub)
 
 import Tak
+import Cell
 import Conversion
+
+-- coordinates
 
 isValidX :: Game -> X -> Bool
 isValidX g x = x' >= 0 && x' <= size g
@@ -34,9 +37,6 @@ isValidCount g (count, xy, _, _) =
 
 isValidDrops :: Count -> Drops -> Bool
 isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
-
-isEmpty :: Cell -> Bool
-isEmpty (Cell _ zs) = null zs
 
 getOwned :: [Cell] -> [Cell]
 getOwned = filter (not . isEmpty)
@@ -101,25 +101,6 @@ isUnderControl g (_, xy, _, _) = case getCell (board g) xy of
   Just c -> case getTopStone c of
     Nothing -> False
     Just (Stone owner _) -> owner == player g
-
--- F or empty cell
-isToppable :: Cell -> Bool
-isToppable c = case getTopStone c of
-  Just (Stone _ t) -> t == F
-  Nothing -> True
-
--- C on top of stack
-hasCap :: Cell -> Bool
-hasCap c = case getTopStone c of
-  Just (Stone _ t) -> t == C
-  Nothing -> False
-
--- S and last drop == 1
-isFlattenable :: Cell -> Drops -> Bool
-isFlattenable c drops = case getTopStone c of
-  Nothing -> False
-  -- a cap can only flatten when alone
-  Just (Stone _ t) -> t == S && ((last . show $ drops) == '1')
 
 isDropzoneClear :: Game -> Move -> Bool
 isDropzoneClear g (count, xy, dir, drops) = clear

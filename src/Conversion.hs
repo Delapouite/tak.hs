@@ -6,6 +6,7 @@ import Data.List.Split (chunksOf)
 import Data.Maybe (fromJust, isJust)
 
 import Tak
+import Cell
 
 getSize :: Board -> Int
 getSize = truncate . sqrt . fromIntegral . length
@@ -27,22 +28,8 @@ getCell b xy = find (\(Cell xy' _) -> xy == xy') b
 getStacks :: Game -> [Stack]
 getStacks g = map (\(Cell _ zs) -> zs) $ board g
 
-getHeight :: Cell -> Int
-getHeight (Cell _ zs) = length zs
-
 getMaxHeight :: [Cell] -> Int
 getMaxHeight cells = maximum $ map getHeight cells
-
--- TODO maybeLast?
-getTopStone :: Cell -> Maybe Stone
-getTopStone (Cell _ zs)
-  | null zs   = Nothing
-  | otherwise = Just $ last zs
-
-getOwner :: Cell -> Maybe Player
-getOwner c = case getTopStone c of
-  Nothing -> Nothing
-  Just (Stone owner _) -> Just owner
 
 -- beware resulting XY can be out of bounds
 getNextXY :: XY -> Dir -> XY

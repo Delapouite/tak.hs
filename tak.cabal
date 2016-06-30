@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Tak
                      , Action
+                     , Cell
                      , Conversion
                      , Display
                      , Parser
@@ -46,6 +47,7 @@ test-suite tak-test
                      , HUnit
                      , split
   other-modules:       ActionSpec
+                     , CellSpec
                      , ConversionSpec
                      , ParserSpec
                      , TPSSpec
