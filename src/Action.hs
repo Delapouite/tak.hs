@@ -62,27 +62,29 @@ zipXYandCounts m@(count, xy, dir, drops) = zip xys counts
 
 handleShow :: Game -> Either X Y -> (Game, Display)
 handleShow g xory = case xory of
-    Left x -> if isValidX g x then (g, showCol b x) else (g, "Wrong x coordinate")
-    Right y -> if isValidY g y then (g, showRow b y) else (g, "Wrong y coordinate")
+  Left x -> if isValidX s x then (g, showCol b x) else (g, "Wrong x coordinate")
+  Right y -> if isValidY s y then (g, showRow b y) else (g, "Wrong y coordinate")
   where
+    s = size g
     b = board g
 
 handlePlace :: Game -> XY -> StoneType -> (Game, Display)
 handlePlace g xy st
-  | not $ isValidXY g xy          = (g, "Wrong xy coordinates")
-  | not $ canPlace (board g) xy   = (g, "The cell must be empty")
+  | not $ isValidXY (size g) xy   = (g, "Wrong xy coordinates")
+  | not $ canPlace b xy           = (g, "The cell must be empty")
   | st == C && not (capsInDeck g) = (g, "No more caps in deck")
-  | otherwise                     = updateAndShowGame g $ placeStone (board g) xy (getPlayer g) st
+  | otherwise                     = updateAndShowGame g $ placeStone b xy (getPlayer g) st
+  where
+    b = board g
 
 handleMove :: Game -> Move -> (Game, Display)
 handleMove g m@(count, xy, dir, drops)
-  | not $ isValidXY g xy           = (g, "Wrong xy coordinates")
+  | not $ isValidXY (size g) xy    = (g, "Wrong xy coordinates")
   | not $ isUnderControl g xy      = (g, "You do not control the cell")
   | not $ isValidCount g m         = (g, "Wrong count")
   | not $ isValidDrops count drops = (g, "Wrong drops")
   | not $ isDropzoneClear g m      = (g, "The dropzone is not clear")
   | otherwise                      = updateAndShowGame g $ moveStack (board g) m
-
 
 handleAction :: Game -> Action -> (Game, Display)
 handleAction g a = case a of

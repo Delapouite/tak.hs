@@ -11,19 +11,19 @@ import Conversion
 
 -- coordinates
 
-isValidX :: Game -> X -> Bool
-isValidX g x = x' >= 0 && x' <= size g
+isValidX :: Size -> X -> Bool
+isValidX s x = x' >= 0 && x' <= s
   where
     x' = xToInt x
 
-isValidY :: Game -> Y -> Bool
-isValidY g y = y > 0 && y <= size g
+isValidY :: Size -> Y -> Bool
+isValidY s y = y > 0 && y <= s
 
 -- in bounds
-isValidXY :: Game -> XY -> Bool
-isValidXY g (x,y) = isValidX g x && isValidY g y
+isValidXY :: Size -> XY -> Bool
+isValidXY s (x,y) = isValidX s x && isValidY s y
 
-isValidSize :: Int -> Bool
+isValidSize :: Size -> Bool
 isValidSize s = s >= minSize && s <= maxSize
 
 -- carry limit, stack height

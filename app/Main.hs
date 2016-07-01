@@ -43,7 +43,7 @@ promptInt q = do
   a <- prompt q
   return (readMaybe a :: Maybe Int)
 
-promptSize :: IO Int
+promptSize :: IO Size
 promptSize = do
   size <- promptInt $ "Size of the board? [" ++ show minSize ++ ".." ++ show maxSize ++ "]"
   case size of

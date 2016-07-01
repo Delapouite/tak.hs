@@ -20,6 +20,7 @@ data StoneType = F | S | C deriving (Eq, Show, Read)
 -- P1 in UpperCase, P2 in LowerCase
 data Stone = Stone Player StoneType deriving (Eq)
 
+type Size = Int
 type X = Char
 type Y = Int
 type XY = (X, Y)
@@ -44,22 +45,22 @@ type Verb = String
 data Action = Action Verb [String]
 type Display = String
 
-data Game = Game { size :: Int
+data Game = Game { size :: Size
                  , board :: Board
                  , player :: Player
                  , turn :: Int
                  }
 
-minSize = 3 :: Int
-maxSize = 8 :: Int
+minSize = 3 :: Size
+maxSize = 8 :: Size
 
 -- axis
 xs = ['a'..]
 
-initBoard :: Int -> Board
+initBoard :: Size -> Board
 initBoard size = take (size ^ 2) [Cell (x, y) [] | x <- xs, y <- [1..size]]
 
-stoneCount :: Int -> Int
+stoneCount :: Size -> Int
 stoneCount 3 = 10
 stoneCount 4 = 15
 stoneCount 5 = 21
@@ -67,7 +68,7 @@ stoneCount 6 = 30
 stoneCount 7 = 40
 stoneCount 8 = 50
 
-capCount :: Int -> Int
+capCount :: Size -> Int
 capCount 8 = 2
 capCount 4 = 0
 capCount 3 = 0
