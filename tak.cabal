@@ -21,6 +21,7 @@ library
                      , Cell
                      , Conversion
                      , Display
+                     , Game
                      , Parser
                      , TPS
                      , Validation

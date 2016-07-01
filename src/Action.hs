@@ -6,6 +6,7 @@ import Tak
 import Board
 import Conversion
 import Display
+import Game
 import Parser
 import Validation
 
@@ -71,7 +72,7 @@ handlePlace g xy st
   | not $ isValidXY g xy          = (g, "Wrong xy coordinates")
   | not $ canPlace (board g) xy   = (g, "The cell must be empty")
   | st == C && not (capsInDeck g) = (g, "No more caps in deck")
-  | otherwise                     = updateAndShowGame g $ placeStone (board g) xy (player g) st
+  | otherwise                     = updateAndShowGame g $ placeStone (board g) xy (getPlayer g) st
 
 handleMove :: Game -> Move -> (Game, Display)
 handleMove g m@(count, xy, dir, drops)
