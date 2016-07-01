@@ -16,9 +16,9 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Tak
-                     , Action
                      , Board
                      , Cell
+                     , Command
                      , Conversion
                      , Display
                      , Game
@@ -48,9 +48,9 @@ test-suite tak-test
                      , test-framework-hunit
                      , HUnit
                      , split
-  other-modules:       ActionSpec
-                     , BoardSpec
+  other-modules:       BoardSpec
                      , CellSpec
+                     , CommandSpec
                      , ConversionSpec
                      , ParserSpec
                      , TPSSpec

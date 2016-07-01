@@ -8,8 +8,8 @@ import Text.Read (readMaybe)
 import Tak
 import Conversion
 
-parseAction :: String -> Action
-parseAction s = Action verb args
+parseCommand :: String -> Command
+parseCommand s = Command verb args
   where
     (verb:args) = words s
 

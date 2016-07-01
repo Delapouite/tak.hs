@@ -42,7 +42,7 @@ type Move = (Count, XY, Dir, Drops)
 data Dir = North | East | South | West deriving (Eq, Show)
 
 type Verb = String
-data Action = Action Verb [String]
+data Command = Command Verb [String]
 type Display = String
 
 data Game = Game { size :: Size

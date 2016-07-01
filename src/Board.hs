@@ -1,5 +1,6 @@
 module Board where
 
+import Data.Char (digitToInt)
 import Data.List (find, transpose)
 import Data.List.Split (chunksOf)
 import Data.Maybe (fromJust, isJust)
@@ -59,7 +60,7 @@ getPlacedByPlayerAndType b p st = filter (\(Stone _ t) -> t == st) $ getPlacedBy
 getRow :: Board -> Y -> Row
 getRow b y = toRows b !! (y - 1)
 
-getSize :: Board -> Int
+getSize :: Board -> Size
 getSize = truncate . sqrt . fromIntegral . length
 
 getStacks :: Board -> [Stack]
@@ -81,3 +82,43 @@ toCols b = chunksOf (getSize b) b
 
 toRows :: Board -> [Row]
 toRows = transpose . toCols
+
+-- stack
+
+stackStones :: XY -> Stack -> Cell -> Cell
+stackStones xy stones c@(Cell xy' zs) = if xy == xy'
+  then Cell xy (flattenStack zs ++ stones)
+  else c
+
+unstackStones :: XY -> Count -> Cell -> Cell
+unstackStones xy count c@(Cell xy' zs) = if xy == xy'
+  then Cell xy (reverse (drop count $ reverse zs))
+  else c
+
+placeStone :: Board -> XY -> Player -> StoneType -> Board
+placeStone b xy p st = map (stackStones xy [Stone p st]) b
+
+-- turn all stones to F
+flattenStack :: Stack -> Stack
+flattenStack = map (\(Stone p t) -> (Stone p F))
+
+moveSubstack :: Board -> Count -> XY -> XY -> Board
+moveSubstack b count fromXY toXY = map (stackStones toXY (reverse stones)) b'
+  where
+    Just (Cell _ zs) = getCell b fromXY
+    stones = take count $ reverse zs
+    b' = map (unstackStones fromXY count) b
+
+-- TODO
+moveStack :: Board -> Move -> Board
+moveStack b m@(count, xy, dir, drops) = foldl reducer b $ zipXYandCounts m
+  where
+    reducer acc (xy, drop) = moveSubstack acc drop xy (getNextXY xy dir)
+
+zipXYandCounts :: Move -> [(XY, Count)]
+zipXYandCounts m@(count, xy, dir, drops) = zip xys counts
+  where
+    xys = init $ xy : getNextXYs xy dir drops
+    drops' = map digitToInt (show drops)
+    counts = foldl reducer [count] $ init drops'
+    reducer acc drop = acc ++ [last acc - drop]

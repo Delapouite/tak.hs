@@ -6,9 +6,9 @@ import Text.Read (readMaybe)
 import System.IO (hFlush, stdout)
 
 import Tak
-import Action
 import Board
 import Cell
+import Command
 import Conversion
 import Display
 import Parser
@@ -18,8 +18,8 @@ import Validation
 
 loop :: Game -> IO ()
 loop g = do
-  action <- prompt $ getPrompt g
-  let (g', display) = handleAction g $ parseAction action
+  command <- prompt $ getPrompt g
+  let (g', display) = handleCommand g $ parseCommand command
   putStrLn display
   case checkEnd g' of
     Just reason -> putStrLn reason
