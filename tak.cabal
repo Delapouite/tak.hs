@@ -50,6 +50,7 @@ test-suite tak-test
                      , split
   other-modules:       BoardSpec
                      , CellSpec
+                     , GameSpec
                      , CommandSpec
                      , ConversionSpec
                      , ParserSpec

@@ -4,6 +4,7 @@ import BoardSpec
 import CellSpec
 import CommandSpec
 import ConversionSpec
+import GameSpec
 import ParserSpec
 import TPSSpec
 import ValidationSpec
@@ -14,6 +15,7 @@ main = runTestTT $ TestList
   , testsCell
   , testsCommand
   , testsConversion
+  , testsGame
   , testsParser
   , testsTPS
   , testsValidation
