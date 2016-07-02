@@ -18,8 +18,14 @@ testsToStoneType = TestList
   , TestCase $ toStoneType "F" @?= F
   ]
 
+testsToPlayer = TestList
+  [ TestCase $ toPlayer "1" @?= P1
+  , TestCase $ toPlayer "2" @?= P2
+  ]
+
 testsConversion = TestList
   [ testsXtoInt
   , testsToXorY
   , testsToStoneType
+  , testsToPlayer
   ]
