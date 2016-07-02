@@ -109,7 +109,6 @@ moveSubstack b count fromXY toXY = map (stackStones toXY (reverse stones)) b'
     stones = take count $ reverse zs
     b' = map (unstackStones fromXY count) b
 
--- TODO
 moveStack :: Board -> Move -> Board
 moveStack b m@(count, xy, dir, drops) = foldl reducer b $ zipXYandCounts m
   where
