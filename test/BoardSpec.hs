@@ -48,21 +48,6 @@ testsGetMaxHeight = TestList
 testsGetMaxX = TestList
   [ TestCase $ getMaxX mockBoard @?= 'c' ]
 
-testsGetNextXY = TestList
-  [ TestCase $ getNextXY ('b', 2) North @?= ('b', 3)
-  , TestCase $ getNextXY ('b', 2) East  @?= ('c', 2)
-  , TestCase $ getNextXY ('b', 2) South @?= ('b', 1)
-  , TestCase $ getNextXY ('b', 2) West  @?= ('a', 2)
-  ]
-
-testsGetNextXYs = TestList
-  [ TestCase $ getNextXYs ('b', 2) East 1 @?= [('c', 2)]
-  , TestCase $ getNextXYs ('b', 2) East 2 @?= [('c', 2)]
-  , TestCase $ getNextXYs ('b', 2) East 21 @?= [('c', 2), ('d', 2)]
-  , TestCase $ getNextXYs ('b', 2) North 21 @?= [('b', 3), ('b', 4)]
-  , TestCase $ getNextXYs ('b', 2) North 212 @?= [('b', 3), ('b', 4), ('b', 5)]
-  ]
-
 testsGetNeighbors = TestList
   [ TestCase $ getNeighbors mockBoard ('a', 1) @?=
     [ mockCellA2
@@ -79,6 +64,26 @@ testsGetNeighbors = TestList
     , Cell ('b', 1) []
     , mockCellA2
     ]
+  ]
+
+testsGetNextXY = TestList
+  [ TestCase $ getNextXY ('b', 2) North @?= ('b', 3)
+  , TestCase $ getNextXY ('b', 2) East  @?= ('c', 2)
+  , TestCase $ getNextXY ('b', 2) South @?= ('b', 1)
+  , TestCase $ getNextXY ('b', 2) West  @?= ('a', 2)
+  ]
+
+testsGetNextXYs = TestList
+  [ TestCase $ getNextXYs ('b', 2) East 1 @?= [('c', 2)]
+  , TestCase $ getNextXYs ('b', 2) East 2 @?= [('c', 2)]
+  , TestCase $ getNextXYs ('b', 2) East 21 @?= [('c', 2), ('d', 2)]
+  , TestCase $ getNextXYs ('b', 2) North 21 @?= [('b', 3), ('b', 4)]
+  , TestCase $ getNextXYs ('b', 2) North 212 @?= [('b', 3), ('b', 4), ('b', 5)]
+  ]
+
+testsGetOwned = TestList
+  [ TestCase $ getOwned mockBoard @?=
+    [mockCellA1, mockCellA2, mockCellA3, mockCellB3]
   ]
 
 testsGetRow = TestList
@@ -180,6 +185,7 @@ testsBoard = TestList
   , testsGetNeighbors
   , testsGetNextXY
   , testsGetNextXYs
+  , testsGetOwned
   , testsGetRow
   , testsGetSize
   , testsGetValidNeighbors
