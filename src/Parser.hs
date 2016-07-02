@@ -9,6 +9,8 @@ import Tak
 import Conversion
 
 parseCommand :: String -> Command
+-- default
+parseCommand "" = Command "show" []
 parseCommand s = Command verb args
   where
     (verb:args) = words s
