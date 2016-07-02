@@ -3,6 +3,7 @@ module Parser where
 import Data.Char (digitToInt, isAlpha, isDigit, toLower, toUpper)
 import Data.List (intercalate, intersperse)
 import Data.List.Split (splitOn)
+import Data.Maybe (isJust)
 import Text.Read (readMaybe)
 
 import Tak
@@ -61,6 +62,7 @@ parseDrops c str = case reads str :: [(Int, String)] of
   [] -> c
 
 parseUnknownVerb :: Verb -> Maybe Command
-parseUnknownVerb v = case parsePlace v of
-  Just _ -> Just $ Command "place" [v]
-  Nothing -> Nothing
+parseUnknownVerb v
+  | isJust $ parsePlace v = Just $ Command "place" [v]
+  | isJust $ parseMove v = Just $ Command "move" [v]
+  | otherwise = Nothing
