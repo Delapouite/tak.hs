@@ -60,3 +60,7 @@ parseDrops c str = case reads str :: [(Int, String)] of
   [(drops, _)] -> drops
   [] -> c
 
+parseUnknownVerb :: Verb -> Maybe Command
+parseUnknownVerb v = case parseXY v of
+  Just xy -> Just $ Command "place" [v]
+  Nothing -> Nothing

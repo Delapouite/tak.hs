@@ -44,5 +44,9 @@ handleCommand g a = case a of
     (Command "move" (args:_)) -> case parseMove args of
       Just m -> handleMove g m
       _ -> (g, "Wrong args for move")
-    _ -> (g, "Unknown command")
+
+    -- shortcuts
+    (Command verb _) -> case parseUnknownVerb verb of
+      Just c -> handleCommand g c
+      _ -> (g, "Unknown command")
 
