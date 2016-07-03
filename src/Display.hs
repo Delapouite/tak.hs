@@ -1,61 +1,74 @@
 module Display where
 
+import Data.Char (toLower)
+import Text.PrettyPrint.ANSI.Leijen
+
 import Tak
 import Board
 import Conversion
+import Option
 
-instance Show Stone where
-  show (Stone P1 F) = "F"
-  show (Stone P2 F) = "f"
-  show (Stone P1 S) = "S"
-  show (Stone P2 S) = "s"
-  show (Stone P1 C) = "C"
-  show (Stone P2 C) = "c"
+toColor1 :: String -> String
+toColor1 = show . blue . text
 
-instance Show Cell where
-  show (Cell _ zs) = showStack zs
+toColor2 :: String -> String
+toColor2 = show . yellow . text
 
-showBoard :: Board -> Display
-showBoard = unlines . reverse . map showCells . toRows
+showPlayer :: Colored -> Player -> Display
+showPlayer True P1 = toColor1 "P1"
+showPlayer True P2 = toColor2 "P2"
+showPlayer _ p = show p
 
-showCells :: [Cell] -> Display
-showCells = unwords . map show
+showCell :: Colored -> Cell -> Display
+showCell colored (Cell _ zs) = showStack colored zs
 
-showStack :: Stack -> Display
-showStack [] = "."
-showStack zs = show $ last zs
+showStone :: Colored -> Stone -> Display
+showStone True (Stone P1 t) = toColor1 $ show t
+showStone True (Stone P2 t) = toColor2 $ map toLower $ show t
+showStone _ (Stone P1 t) = show t
+showStone _ (Stone P2 t) = map toLower $ show t
 
-showStackLevel :: [Cell] -> Int -> Display
-showStackLevel cs i = unwords stones
+showBoard :: Colored -> Board -> Display
+showBoard colored = unlines . reverse . map (showCells colored) . toRows
+
+showCells :: Colored -> [Cell] -> Display
+showCells colored = unwords . map (showCell colored)
+
+showStack :: Colored -> Stack -> Display
+showStack _ [] = "."
+showStack colored zs = showStone colored $ last zs
+
+showStackLevel :: Colored -> [Cell] -> Int -> Display
+showStackLevel colored cs i = unwords stones
   where
     stones = map getStone cs
     getStone (Cell _ zs) = if not (null zs) && (length zs - 1 >= i)
-      then show $ zs !! i
+      then showStone colored $ zs !! i
       else " "
 
-showStacks :: [Cell] -> Display
-showStacks cs = unlines $ map (showStackLevel cs) levels
+showStacks :: Colored -> [Cell] -> Display
+showStacks colored cs = unlines $ map (showStackLevel colored cs) levels
   where
     levels = reverse [0..getMaxHeight cs - 1]
 
-showCol :: Board -> X -> Display
-showCol b x = col ++ showYAxis b
+showCol :: Colored -> Board -> X -> Display
+showCol colored b x = col ++ showYAxis b
   where
-    col = showStacks . reverse $ getCol b x
+    col = showStacks colored . reverse $ getCol b x
 
-showRow :: Board -> Y -> Display
-showRow b y = row ++ showXAxis b
+showRow :: Colored -> Board -> Y -> Display
+showRow colored b y = row ++ showXAxis b
   where
-    row = showStacks $ getRow b y
+    row = showStacks colored $ getRow b y
 
-showBoardWithYAxis :: Board -> Display
-showBoardWithYAxis = unlines . reverse . map showRowWithY . toRows
+showBoardWithYAxis :: Colored -> Board -> Display
+showBoardWithYAxis colored = unlines . reverse . map (showRowWithY colored) . toRows
 
-showBoardWithAxes :: Board -> Display
-showBoardWithAxes b = "\n" ++ showBoardWithYAxis b ++ "  " ++ showXAxis b
+showBoardWithAxes :: Colored -> Board -> Display
+showBoardWithAxes colored b = "\n" ++ showBoardWithYAxis colored b ++ "  " ++ showXAxis b
 
-showRowWithY :: Row -> Display
-showRowWithY r = show y ++ " " ++ showCells r
+showRowWithY :: Colored -> Row -> Display
+showRowWithY colored r = show y ++ " " ++ showCells colored r
   where
     (Cell (_, y) _) = head r
 
@@ -67,7 +80,7 @@ showXAxis :: Board -> Display
 showXAxis b = unwords $ map (: []) $ take (getSize b) xs
 
 showDeck :: Game -> Player -> Display
-showDeck g p = show p ++ "'s deck: " ++ flats ++ " " ++ caps ++ "\n"
+showDeck g p = showPlayer (inColors g) p ++ "'s deck: " ++ flats ++ " " ++ caps ++ "\n"
   where
     b = board g
     total = stoneCount $ size g
@@ -75,12 +88,10 @@ showDeck g p = show p ++ "'s deck: " ++ flats ++ " " ++ caps ++ "\n"
     placedCaps = length $ getPlacedByPlayerAndType b p C
     placed = length (getPlacedByPlayer b p) - placedCaps
     flats = show (total - placed)
-    caps = show (totalCaps - placedCaps) ++ show (Stone p C)
+    caps = show (totalCaps - placedCaps) ++ showStone (inColors g) (Stone p C)
 
 showDecks :: Game -> Display
 showDecks g = "\n" ++ showDeck g P1 ++ showDeck g P2
 
 showGame :: Game -> Display
-showGame g = showDecks g ++ showBoardWithAxes (board g)
-
-
+showGame g = showDecks g ++ showBoardWithAxes (inColors g) (board g)

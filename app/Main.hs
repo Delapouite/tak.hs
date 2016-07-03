@@ -13,6 +13,7 @@ import Cell
 import Command
 import Conversion
 import Display
+import Option
 import Parser
 import Validation
 
@@ -41,7 +42,7 @@ getPrompt :: Game -> Display
 getPrompt g = "\nturn " ++ t ++ " / " ++ p ++ ">"
   where
     t = show $ turn g
-    p = show $ player g
+    p = showPlayer (inColors g) (player g)
 
 prompt :: String -> IO Display
 prompt q = do

@@ -5,13 +5,14 @@ import Board
 import Conversion
 import Display
 import Game
+import Option
 import Parser
 import Validation
 
 handleShow :: Game -> Either X Y -> (Game, Display)
 handleShow g xory = case xory of
-  Left x -> if isValidX s x then (g, showCol b x) else (g, "Wrong x coordinate")
-  Right y -> if isValidY s y then (g, showRow b y) else (g, "Wrong y coordinate")
+  Left x -> if isValidX s x then (g, showCol (inColors g) b x) else (g, "Wrong x coordinate")
+  Right y -> if isValidY s y then (g, showRow (inColors g) b y) else (g, "Wrong y coordinate")
   where
     s = size g
     b = board g

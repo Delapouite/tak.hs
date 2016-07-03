@@ -22,11 +22,13 @@ library
                      , Conversion
                      , Display
                      , Game
+                     , Option
                      , Parser
                      , TPS
                      , Validation
   build-depends:       base >= 4.7 && < 5
                      , split
+                     , ansi-wl-pprint
   default-language:    Haskell2010
 
 executable tak-exe
@@ -36,6 +38,7 @@ executable tak-exe
   build-depends:       base
                      , tak
                      , split
+                     , ansi-wl-pprint
   default-language:    Haskell2010
 
 test-suite tak-test
@@ -48,6 +51,7 @@ test-suite tak-test
                      , test-framework-hunit
                      , HUnit
                      , split
+                     , ansi-wl-pprint
   other-modules:       BoardSpec
                      , CellSpec
                      , GameSpec

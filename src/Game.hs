@@ -2,6 +2,7 @@ module Game where
 
 import Tak
 import Display
+import Option
 
 -- on turn 1, players place an opponent's stone
 getPlayer :: Game -> Player
@@ -20,5 +21,4 @@ updateGame g b = g { board = b, player = p, turn = t }
     t = if p == P1 then turn g + 1 else turn g
 
 updateAndShowGame :: Game -> Board -> (Game, Display)
-updateAndShowGame g b = (updateGame g b, showBoardWithAxes b)
-
+updateAndShowGame g b = (updateGame g b, showBoardWithAxes (inColors g) b)

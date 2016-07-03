@@ -33,6 +33,7 @@ This project is managed by [Stack](http://docs.haskellstack.org/en/stable/README
 ## Usage
 
 `stack exec tak-exe` to launch the game
+`stack exec tak-exe -- --colors` to launch the game with colors
 
 ### Size of the board
 
@@ -191,3 +192,4 @@ a b c d e
 ```
 
 Have a good game! For any questions or suggestions, feel free to open a [GH issue](https://github.com/Delapouite/tak.hs/issues)
+
