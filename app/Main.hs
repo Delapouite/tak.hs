@@ -2,8 +2,10 @@ module Main where
 
 -- https://www.youtube.com/watch?v=iEXkpS-Q9dI
 
-import Text.Read (readMaybe)
+import System.Console.GetOpt
+import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
+import Text.Read (readMaybe)
 
 import Tak
 import Board
@@ -13,6 +15,16 @@ import Conversion
 import Display
 import Parser
 import Validation
+
+-- options
+
+optDescrs :: [OptDescr (Options -> IO Options)]
+optDescrs =
+  [ Option "c" ["colors"]
+      (NoArg
+        (\opt -> return opt { optColors = True }))
+      "enable colors"
+  ]
 
 -- IO / prompts
 
@@ -52,7 +64,18 @@ promptSize = do
 
 main = do
   putStrLn "Welcome to Tak.hs"
+
+  args <- getArgs
+  let (flags, _, _) = getOpt RequireOrder optDescrs args
+  opts <- foldl (>>=) (return defaultOptions) flags
+
   size <- promptSize
-  let g = Game { size = size, board = initBoard size, player = P1, turn = 1 }
+  let g = Game { size = size
+               , board = initBoard size
+               , player = P1
+               , turn = 1
+               , options = opts
+               }
+
   putStrLn $ showGame g
   loop g

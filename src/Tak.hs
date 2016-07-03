@@ -45,10 +45,15 @@ type Verb = String
 data Command = Command Verb [String]
 type Display = String
 
+data Options = Options { optColors :: Bool }
+
+defaultOptions = Options { optColors = False }
+
 data Game = Game { size :: Size
                  , board :: Board
                  , player :: Player
                  , turn :: Int
+                 , options :: Options
                  }
 
 minSize = 3 :: Size
