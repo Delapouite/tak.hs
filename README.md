@@ -177,7 +177,7 @@ The `show` command is designed to see the board from the side:
 turn 4 / P2> show b
 
     F
-    F f f
+. . F f f
 5 4 3 2 1
 ```
 
@@ -187,7 +187,7 @@ All is clearer now. There are two stones on b3. We could also inspect the row to
 turn 4 / P2> show 3
 
   F
-  F
+. F . . .
 a b c d e
 ```
 

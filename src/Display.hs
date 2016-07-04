@@ -10,6 +10,8 @@ import Conversion
 
 type ROptions = Reader Options
 
+emptyCell = "."
+
 toColor :: Player -> String -> String
 toColor P1 = show . blue . text
 toColor P2 = show . yellow . text
@@ -38,11 +40,11 @@ showStoneAtLevel :: Int -> Cell -> ROptions Display
 showStoneAtLevel lvl (Cell _ zs) =
   if not (null zs) && (length zs - 1 >= lvl)
   then showStone (zs !! lvl)
-  else return $ if lvl == 0 then "." else " "
+  else return $ if lvl == 0 then emptyCell else " "
 
 -- top view
 showStack :: Stack -> ROptions Display
-showStack [] = return "."
+showStack [] = return emptyCell
 showStack zs = showStone $ last zs
 
 showStackLevel :: [Cell] -> Int -> ROptions Display
@@ -55,7 +57,9 @@ showStacks :: [Cell] -> ROptions Display
 showStacks cs = do
   let levels = reverse [0..getMaxHeight cs - 1]
   stackLevels <- mapM (showStackLevel cs) levels
-  return $ unlines stackLevels
+  return $ if null stackLevels
+      then unwords (map (const emptyCell) cs) ++ "\n"
+      else unlines stackLevels
 
 -- top view
 showCell :: Cell -> ROptions Display
