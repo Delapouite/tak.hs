@@ -45,9 +45,13 @@ type Verb = String
 data Command = Command Verb [String]
 type Display = String
 
-data Options = Options { optColors :: Bool }
+data Options = Options { optColors :: Bool
+                       , optBig :: Bool
+                       }
 
-defaultOptions = Options { optColors = False }
+defaultOptions = Options { optColors = False
+                         , optBig = False
+                         }
 
 data Game = Game { size :: Size
                  , board :: Board

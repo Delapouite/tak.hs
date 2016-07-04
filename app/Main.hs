@@ -25,6 +25,10 @@ optDescrs =
       (NoArg
         (\opt -> return opt { optColors = True }))
       "enable colors"
+  , Option "b" ["big"]
+      (NoArg
+        (\opt -> return opt { optBig = True }))
+      "enable big mode"
   ]
 
 -- IO / prompts
