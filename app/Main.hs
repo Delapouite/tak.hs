@@ -2,6 +2,7 @@ module Main where
 
 -- https://www.youtube.com/watch?v=iEXkpS-Q9dI
 
+import Control.Monad.Reader
 import System.Console.GetOpt
 import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
@@ -13,7 +14,6 @@ import Cell
 import Command
 import Conversion
 import Display
-import Option
 import Parser
 import Validation
 
@@ -42,7 +42,7 @@ getPrompt :: Game -> Display
 getPrompt g = "\nturn " ++ t ++ " / " ++ p ++ ">"
   where
     t = show $ turn g
-    p = showPlayer (inColors g) (player g)
+    p = runReader (showPlayer (player g)) (options g)
 
 prompt :: String -> IO Display
 prompt q = do

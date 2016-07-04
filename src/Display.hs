@@ -1,76 +1,93 @@
 module Display where
 
+import Control.Monad.Reader
 import Data.Char (toLower)
 import Text.PrettyPrint.ANSI.Leijen
 
 import Tak
 import Board
 import Conversion
-import Option
 
-toColor1 :: String -> String
-toColor1 = show . blue . text
+type ROptions = Reader Options
 
-toColor2 :: String -> String
-toColor2 = show . yellow . text
+toColor :: Player -> String -> String
+toColor P1 = show . blue . text
+toColor P2 = show . yellow . text
 
-showPlayer :: Colored -> Player -> Display
-showPlayer True P1 = toColor1 "P1"
-showPlayer True P2 = toColor2 "P2"
-showPlayer _ p = show p
+showPlayer :: Player -> ROptions Display
+showPlayer p = do
+  colored <- asks optColors
+  return $ if colored then toColor p $ show p else show p
 
-showCell :: Colored -> Cell -> Display
-showCell colored (Cell _ zs) = showStack colored zs
+showStone :: Stone -> ROptions Display
+showStone (Stone p t) = do
+  colored <- asks optColors
+  let disp = showStoneType t p
+  return $ if colored then toColor p disp else disp
 
-showStone :: Colored -> Stone -> Display
-showStone True (Stone P1 t) = toColor1 $ show t
-showStone True (Stone P2 t) = toColor2 $ map toLower $ show t
-showStone _ (Stone P1 t) = show t
-showStone _ (Stone P2 t) = map toLower $ show t
+showStoneType :: StoneType -> Player -> Display
+showStoneType t P1 = show t
+showStoneType t P2 = map toLower $ show t
 
-showBoard :: Colored -> Board -> Display
-showBoard colored = unlines . reverse . map (showCells colored) . toRows
+showBoard :: Board -> ROptions Display
+showBoard b = do
+  rows <- mapM showCells $ toRows b
+  return $ unlines . reverse $ rows
 
-showCells :: Colored -> [Cell] -> Display
-showCells colored = unwords . map (showCell colored)
+showCell :: Cell -> ROptions Display
+showCell (Cell _ zs) = showStack zs
 
-showStack :: Colored -> Stack -> Display
-showStack _ [] = "."
-showStack colored zs = showStone colored $ last zs
+showCells :: [Cell] -> ROptions Display
+showCells cs = do
+  cells <- mapM showCell cs
+  return $ unwords cells
 
-showStackLevel :: Colored -> [Cell] -> Int -> Display
-showStackLevel colored cs i = unwords stones
-  where
-    stones = map getStone cs
-    getStone (Cell _ zs) = if not (null zs) && (length zs - 1 >= i)
-      then showStone colored $ zs !! i
-      else " "
+showStack :: Stack -> ROptions Display
+showStack [] = return "."
+showStack zs = showStone $ last zs
 
-showStacks :: Colored -> [Cell] -> Display
-showStacks colored cs = unlines $ map (showStackLevel colored cs) levels
-  where
-    levels = reverse [0..getMaxHeight cs - 1]
+showStoneAtLevel :: Int -> Cell -> ROptions Display
+showStoneAtLevel lvl (Cell _ zs) =
+  if not (null zs) && (length zs - 1 >= lvl)
+  then showStone (zs !! lvl)
+  else return " "
 
-showCol :: Colored -> Board -> X -> Display
-showCol colored b x = col ++ showYAxis b
-  where
-    col = showStacks colored . reverse $ getCol b x
+showStackLevel :: [Cell] -> Int -> ROptions Display
+showStackLevel cs lvl = do
+  stones <- mapM (showStoneAtLevel lvl) cs
+  return $ unwords stones
 
-showRow :: Colored -> Board -> Y -> Display
-showRow colored b y = row ++ showXAxis b
-  where
-    row = showStacks colored $ getRow b y
+showStacks :: [Cell] -> ROptions Display
+showStacks cs = do
+  let levels = reverse [0..getMaxHeight cs - 1]
+  stackLevels <- mapM (showStackLevel cs) levels
+  return $ unlines stackLevels
 
-showBoardWithYAxis :: Colored -> Board -> Display
-showBoardWithYAxis colored = unlines . reverse . map (showRowWithY colored) . toRows
+showCol :: Board -> X -> ROptions Display
+showCol b x = do
+  col <- showStacks . reverse $ getCol b x
+  return $ col ++ showYAxis b
 
-showBoardWithAxes :: Colored -> Board -> Display
-showBoardWithAxes colored b = "\n" ++ showBoardWithYAxis colored b ++ "  " ++ showXAxis b
+showRow :: Board -> Y -> ROptions Display
+showRow b y = do
+  row <- showStacks $ getRow b y
+  return $ row ++ showXAxis b
 
-showRowWithY :: Colored -> Row -> Display
-showRowWithY colored r = show y ++ " " ++ showCells colored r
-  where
-    (Cell (_, y) _) = head r
+showBoardWithYAxis :: Board -> ROptions Display
+showBoardWithYAxis b = do
+  rows <- mapM showRowWithY $ toRows b
+  return $ unlines . reverse $ rows
+
+showBoardWithAxes :: Board -> ROptions Display
+showBoardWithAxes b = do
+  withYAxis <- showBoardWithYAxis b
+  return $ "\n" ++ withYAxis ++ "  " ++ showXAxis b
+
+showRowWithY :: Row -> ROptions Display
+showRowWithY r = do
+  let (Cell (_, y) _) = head r
+  cells <- showCells r
+  return $ show y ++ " " ++ cells
 
 -- horizontally
 showYAxis :: Board -> Display
@@ -80,7 +97,7 @@ showXAxis :: Board -> Display
 showXAxis b = unwords $ map (: []) $ take (getSize b) xs
 
 showDeck :: Game -> Player -> Display
-showDeck g p = showPlayer (inColors g) p ++ "'s deck: " ++ flats ++ " " ++ caps ++ "\n"
+showDeck g p = p' ++ "'s deck: " ++ flats ++ " " ++ caps ++ "\n"
   where
     b = board g
     total = stoneCount $ size g
@@ -88,10 +105,12 @@ showDeck g p = showPlayer (inColors g) p ++ "'s deck: " ++ flats ++ " " ++ caps 
     placedCaps = length $ getPlacedByPlayerAndType b p C
     placed = length (getPlacedByPlayer b p) - placedCaps
     flats = show (total - placed)
-    caps = show (totalCaps - placedCaps) ++ showStone (inColors g) (Stone p C)
+    cap = runReader (showStone (Stone p C)) (options g)
+    caps = show (totalCaps - placedCaps) ++ cap
+    p' = runReader (showPlayer p) (options g)
 
 showDecks :: Game -> Display
 showDecks g = "\n" ++ showDeck g P1 ++ showDeck g P2
 
 showGame :: Game -> Display
-showGame g = showDecks g ++ showBoardWithAxes (inColors g) (board g)
+showGame g = showDecks g ++ runReader (showBoardWithAxes (board g)) (options g)
