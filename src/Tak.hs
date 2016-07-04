@@ -70,15 +70,17 @@ initBoard :: Size -> Board
 initBoard size = take (size ^ 2) [Cell (x, y) [] | x <- xs, y <- [1..size]]
 
 stoneCount :: Size -> Int
-stoneCount 3 = 10
-stoneCount 4 = 15
-stoneCount 5 = 21
-stoneCount 6 = 30
-stoneCount 7 = 40
-stoneCount 8 = 50
+stoneCount s = case s of
+  3 -> 10
+  4 -> 15
+  5 -> 21
+  6 -> 30
+  7 -> 40
+  8 -> 50
 
 capCount :: Size -> Int
-capCount 8 = 2
-capCount 4 = 0
-capCount 3 = 0
-capCount _ = 1
+capCount s = case s of
+  8 -> 2
+  4 -> 0
+  3 -> 0
+  _ -> 1
