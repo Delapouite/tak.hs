@@ -2,7 +2,7 @@ module Display where
 
 import Control.Monad.Reader
 import Data.Char (toLower)
-import Text.PrettyPrint.ANSI.Leijen
+import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 
 import Tak
 import Board
@@ -71,24 +71,38 @@ showCells cs = do
   cells <- mapM showCell cs
   return $ unwords cells
 
--- side view
+-- side view: stacks + axis
 showCol :: Board -> X -> ROptions Display
 showCol b x = do
   col <- showStacks . reverse $ getCol b x
   return $ "\n" ++ col ++ showYAxis b
 
--- side view
+-- side view: stacks + axis
 showRow :: Board -> Y -> ROptions Display
 showRow b y = do
   row <- showStacks $ getRow b y
   return $ "\n" ++ row ++ showXAxis b
 
+showRowWithYSmall :: Y -> Row -> ROptions Display
+showRowWithYSmall y r = do
+  cells <- showCells r
+  return $ show y ++ " " ++ cells
+
+showRowWithYBig :: Y -> Row -> ROptions Display
+showRowWithYBig y r = do
+  stacks <- lines <$> showStacks r
+  let i = map (\s -> "  " ++ s) $ init stacks
+  let l = show y ++ " " ++ last stacks
+  return $ unlines $ i ++ [l]
+
 -- top view
 showRowWithY :: Row -> ROptions Display
 showRowWithY r = do
+  big <- asks optBig
   let (Cell (_, y) _) = head r
-  cells <- showCells r
-  return $ show y ++ " " ++ cells
+  if big
+    then showRowWithYBig y r
+    else showRowWithYSmall y r
 
 showBoard :: Board -> ROptions Display
 showBoard b = do
