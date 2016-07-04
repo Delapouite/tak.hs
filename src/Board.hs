@@ -86,14 +86,14 @@ toRows = transpose . toCols
 -- stack
 
 stackStones :: XY -> Stack -> Cell -> Cell
-stackStones xy stones c@(Cell xy' zs) = if xy == xy'
-  then Cell xy (flattenStack zs ++ stones)
-  else c
+stackStones xy stones c@(Cell xy' zs)
+  | xy == xy' = Cell xy (flattenStack zs ++ stones)
+  | otherwise = c
 
 unstackStones :: XY -> Count -> Cell -> Cell
-unstackStones xy count c@(Cell xy' zs) = if xy == xy'
-  then Cell xy (reverse (drop count $ reverse zs))
-  else c
+unstackStones xy count c@(Cell xy' zs)
+  | xy == xy' = Cell xy (reverse (drop count $ reverse zs))
+  | otherwise = c
 
 placeStone :: Board -> XY -> Player -> StoneType -> Board
 placeStone b xy p st = map (stackStones xy [Stone p st]) b

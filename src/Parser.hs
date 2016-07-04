@@ -17,7 +17,9 @@ parseCommand s = Command verb args
     (verb:args) = words s
 
 parseXY :: String -> Maybe XY
-parseXY (x:y:[]) = if isAlpha x && isDigit y then Just (toLower x, read [y]) else Nothing
+parseXY (x:y:[])
+  | isAlpha x && isDigit y = Just (toLower x, read [y])
+  | otherwise              = Nothing
 parseXY _ = Nothing
 
 -- PTN: (stone)(square)
@@ -44,9 +46,9 @@ parseMove str = case parseCount str of
 
 -- default to 1
 parseCount :: String -> (Count, String)
-parseCount (h:str) = if isDigit h
-  then (read [h], str)
-  else (1, h:str)
+parseCount (h:str)
+  | isDigit h = (read [h], str)
+  | otherwise = (1, h:str)
 
 parseDir :: Char -> Maybe Dir
 parseDir c = case c of

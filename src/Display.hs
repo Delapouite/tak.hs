@@ -37,10 +37,10 @@ showStone (Stone p t) = do
   return $ if colored then toColor p disp else disp
 
 showStoneAtLevel :: Int -> Cell -> ROptions Display
-showStoneAtLevel lvl (Cell _ zs) =
-  if not (null zs) && (length zs - 1 >= lvl)
-  then showStone (zs !! lvl)
-  else return $ if lvl == 0 then emptyCell else " "
+showStoneAtLevel lvl (Cell _ zs)
+  | not (null zs) && (length zs - 1 >= lvl) = showStone (zs !! lvl)
+  | lvl == 0  = return emptyCell
+  | otherwise = return " "
 
 -- top view
 showStack :: Stack -> ROptions Display

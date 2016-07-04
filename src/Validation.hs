@@ -60,14 +60,14 @@ checkRoad b isEnd visited c@(Cell xy _) =
 checkHalfRoads :: Board -> (Cell -> Bool) -> [Cell] -> [Player]
 checkHalfRoads b isEnd starts = nub $ mapMaybe roadOwner starts
   where
-    roadOwner c = if checkRoad b isEnd starts c
-      then getOwner c
-      else Nothing
+    roadOwner c
+      | checkRoad b isEnd starts c = getOwner c
+      | otherwise                  = Nothing
 
 checkRoads :: Game -> Maybe Display
-checkRoads g = if not $ null roadOwners
-  then Just ("Road(s) completed by: " ++ show roadOwners)
-  else Nothing
+checkRoads g
+  | not $ null roadOwners = Just ("Road(s) completed by: " ++ show roadOwners)
+  | otherwise             = Nothing
   where
     b = board g
     -- horizontal (West → East): col a → col maxX
@@ -82,9 +82,9 @@ checkRoads g = if not $ null roadOwners
     roadOwners = nub $ hRoadOwners ++ vRoadOwners
 
 checkEnd :: Game -> Maybe Display
-checkEnd g = if isBoardFull b
-  then Just ("Board's full! Flat winner is " ++ show winner)
-  else checkRoads g
+checkEnd g
+  | isBoardFull b = Just ("Board's full! Flat winner is " ++ show winner)
+  | otherwise     = checkRoads g
   where
     b = board g
     p1FlatsCount = length $ getPlacedByPlayerAndType b P1 F
