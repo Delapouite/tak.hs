@@ -38,7 +38,7 @@ showStoneAtLevel :: Int -> Cell -> ROptions Display
 showStoneAtLevel lvl (Cell _ zs) =
   if not (null zs) && (length zs - 1 >= lvl)
   then showStone (zs !! lvl)
-  else return " "
+  else return $ if lvl == 0 then "." else " "
 
 -- top view
 showStack :: Stack -> ROptions Display
@@ -71,13 +71,13 @@ showCells cs = do
 showCol :: Board -> X -> ROptions Display
 showCol b x = do
   col <- showStacks . reverse $ getCol b x
-  return $ col ++ showYAxis b
+  return $ "\n" ++ col ++ showYAxis b
 
 -- side view
 showRow :: Board -> Y -> ROptions Display
 showRow b y = do
   row <- showStacks $ getRow b y
-  return $ row ++ showXAxis b
+  return $ "\n" ++ row ++ showXAxis b
 
 -- top view
 showRowWithY :: Row -> ROptions Display
