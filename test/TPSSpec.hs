@@ -51,10 +51,23 @@ testsParseTPSX = TestList
   , TestCase $ parseTPSX "12S" @?= "12S"
   ]
 
+testsToTPSX = TestList
+  [ TestCase $ toTPSX "x,x,x" @?= "x3"
+  , TestCase $ toTPSX "x" @?= "x"
+  , TestCase $ toTPSX "12S" @?= "12S"
+  ]
+
 testsParseTPSCell = TestList
   [ TestCase $ parseTPSCell "2" ('b', 3) @?= Cell ('b', 3) [Stone P2 F]
   , TestCase $ parseTPSCell "2C" ('b', 3) @?= Cell ('b', 3) [Stone P2 C]
   , TestCase $ parseTPSCell "12C" ('b', 3) @?= Cell ('b', 3) [Stone P2 C, Stone P1 F]
+  ]
+
+testsToTPSCell = TestList
+  [ TestCase $ toTPSCell (Cell ('b', 3) []) @?= "x"
+  , TestCase $ toTPSCell (Cell ('b', 3) [Stone P2 F]) @?= "2"
+  , TestCase $ toTPSCell (Cell ('b', 3) [Stone P2 C]) @?= "2C"
+  , TestCase $ toTPSCell (Cell ('b', 3) [Stone P2 C, Stone P1 F]) @?= "12C"
   ]
 
 testsParseTPSStack = TestList
@@ -66,10 +79,36 @@ testsParseTPSStack = TestList
   , TestCase $ parseTPSStack "121C" @?= [Stone P1 C, Stone P2 F, Stone P1 F]
   ]
 
+testsToTPSStack = TestList
+  [ TestCase $ toTPSStack [] @?= "x"
+  , TestCase $ toTPSStack [Stone P2 F] @?= "2"
+  , TestCase $ toTPSStack [Stone P2 F, Stone P1 F] @?= "12"
+  , TestCase $ toTPSStack [Stone P2 S, Stone P1 F] @?= "12S"
+  , TestCase $ toTPSStack [Stone P1 C, Stone P2 F] @?= "21C"
+  , TestCase $ toTPSStack [Stone P1 C, Stone P2 F, Stone P1 F] @?= "121C"
+  ]
+
+testsToTPSStone = TestList
+  [ TestCase $ toTPSStone (Stone P1 F) @?= "1"
+  , TestCase $ toTPSStone (Stone P2 F) @?= "2"
+  , TestCase $ toTPSStone (Stone P1 S) @?= "1S"
+  , TestCase $ toTPSStone (Stone P2 C) @?= "2C"
+  ]
+
+testsToTPSPlayer = TestList
+  [ TestCase $ toTPSPlayer P1 @?= "1"
+  , TestCase $ toTPSPlayer P2 @?= "2"
+  ]
+
 testsTPS = TestList
   [ testsParseTPSBoard
   , testsParseTPSRow
   , testsParseTPSX
+  , testsToTPSX
   , testsParseTPSCell
+  , testsToTPSCell
   , testsParseTPSStack
+  , testsToTPSStack
+  , testsToTPSStone
+  , testsToTPSPlayer
   ]

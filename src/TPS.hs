@@ -43,8 +43,16 @@ parseTPSX :: String -> String
 parseTPSX ['x', n] = intersperse ',' $ replicate (digitToInt n) 'x'
 parseTPSX tps = tps
 
+toTPSX :: String -> String
+toTPSX str
+  | ',' `elem` str = 'x' : (show . length $ filter (== 'x') str)
+  | otherwise = str
+
 parseTPSCell :: String -> XY -> Cell
 parseTPSCell tps xy = Cell xy (parseTPSStack tps)
+
+toTPSCell :: Cell -> String
+toTPSCell (Cell _ zs) = toTPSStack zs
 
 parseTPSStack :: String -> Stack
 parseTPSStack "x" = []
@@ -57,3 +65,15 @@ parseTPSStack tps = stones'
     stones = map (\c -> Stone (toPlayer [c]) F) chars
     stones' = map (\(Stone p _) -> Stone p topSType) [head stones] ++ tail stones
 
+toTPSStack :: Stack -> String
+toTPSStack [] = "x"
+toTPSStack zs = concatMap toTPSStone $ reverse zs
+
+toTPSStone :: Stone -> String
+toTPSStone (Stone p t) = case t of
+  F -> toTPSPlayer p
+  _ -> toTPSPlayer p ++ show t
+
+toTPSPlayer :: Player -> String
+toTPSPlayer P1 = "1"
+toTPSPlayer P2 = "2"
