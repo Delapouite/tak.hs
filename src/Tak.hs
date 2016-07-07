@@ -24,8 +24,8 @@ type Size = Int
 type X = Char
 type Y = Int
 type XY = (X, Y)
--- TODO reverse order?
--- bottom to top (zs)
+
+-- top to bottom, often refered as zs through the code (3rd dimension)
 type Stack = [Stone]
 
 data Cell = Cell XY Stack deriving (Eq, Show)

@@ -6,8 +6,8 @@ import Tak
 import Cell
 import Display
 
-mockStackS1 = [Stone P1 F, Stone P2 F, Stone P1 S]
-mockStackC1 = [Stone P2 F, Stone P1 C]
+mockStackS1 = [Stone P1 S, Stone P2 F, Stone P1 F]
+mockStackC1 = [Stone P1 C, Stone P2 F]
 mockStackF2 = [Stone P2 F]
 
 mockCellA1 = Cell ('a', 1) mockStackS1
@@ -24,13 +24,13 @@ testsGetHeight = TestList
 testsGetOwner = TestList
   [ TestCase $ getOwner (Cell ('b', 2) []) @?= Nothing
   , TestCase $ getOwner (Cell ('b', 2) [Stone P1 F]) @?= Just P1
-  , TestCase $ getOwner (Cell ('b', 2) [Stone P1 F, Stone P2 S]) @?= Just P2
+  , TestCase $ getOwner (Cell ('b', 2) [Stone P2 S, Stone P1 F]) @?= Just P2
   ]
 
 testsGetTopStone = TestList
   [ TestCase $ getTopStone (Cell ('b', 2) []) @?= Nothing
   , TestCase $ getTopStone (Cell ('b', 2) [Stone P1 F]) @?= Just (Stone P1 F)
-  , TestCase $ getTopStone (Cell ('b', 2) [Stone P1 F, Stone P2 C]) @?= Just (Stone P2 C)
+  , TestCase $ getTopStone (Cell ('b', 2) [Stone P2 C, Stone P1 F]) @?= Just (Stone P2 C)
   ]
 
 testsHasCap = TestList
@@ -48,6 +48,7 @@ testsIsToppable = TestList
   [ TestCase $ isToppable (Cell ('a', 1) []) @?= True
   , TestCase $ isToppable (Cell ('a', 1) [Stone P1 F]) @?= True
   , TestCase $ isToppable (Cell ('a', 1) [Stone P1 F, Stone P1 F]) @?= True
+  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 S, Stone P1 F]) @?= False
   , TestCase $ isToppable (Cell ('a', 1) [Stone P1 S]) @?= False
   , TestCase $ isToppable (Cell ('a', 1) [Stone P1 C]) @?= False
   ]

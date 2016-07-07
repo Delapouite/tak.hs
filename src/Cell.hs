@@ -1,6 +1,7 @@
 module Cell where
 
 import Tak
+import Safe (headMay)
 
 getHeight :: Cell -> Int
 getHeight (Cell _ zs) = length zs
@@ -10,11 +11,8 @@ getOwner c = case getTopStone c of
   Nothing -> Nothing
   Just (Stone owner _) -> Just owner
 
--- TODO maybeLast?
 getTopStone :: Cell -> Maybe Stone
-getTopStone (Cell _ zs)
-  | null zs   = Nothing
-  | otherwise = Just $ last zs
+getTopStone (Cell _ zs) = headMay zs
 
 -- C on top of stack
 hasCap :: Cell -> Bool

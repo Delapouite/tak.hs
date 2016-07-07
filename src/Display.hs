@@ -38,14 +38,14 @@ showStone (Stone p t) = do
 
 showStoneAtLevel :: Int -> Cell -> ROptions Display
 showStoneAtLevel lvl (Cell _ zs)
-  | not (null zs) && (length zs - 1 >= lvl) = showStone (zs !! lvl)
+  | not (null zs) && (length zs - 1 >= lvl) = showStone (reverse zs !! lvl)
   | lvl == 0  = return emptyCell
   | otherwise = return " "
 
 -- top view
 showStack :: Stack -> ROptions Display
 showStack [] = return emptyCell
-showStack zs = showStone $ last zs
+showStack zs = showStone $ head zs
 
 showStackLevel :: [Cell] -> Int -> ROptions Display
 showStackLevel cs lvl = do

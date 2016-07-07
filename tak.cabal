@@ -27,6 +27,7 @@ library
                      , Validation
   build-depends:       base >= 4.7 && < 5
                      , mtl
+                     , safe
                      , split
                      , ansi-wl-pprint
   default-language:    Haskell2010
@@ -38,6 +39,7 @@ executable tak-exe
   build-depends:       base
                      , tak
                      , mtl
+                     , safe
                      , split
                      , ansi-wl-pprint
   default-language:    Haskell2010
@@ -52,6 +54,7 @@ test-suite tak-test
                      , test-framework-hunit
                      , HUnit
                      , mtl
+                     , safe
                      , split
                      , ansi-wl-pprint
   other-modules:       BoardSpec

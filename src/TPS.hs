@@ -50,8 +50,10 @@ parseTPSStack :: String -> Stack
 parseTPSStack "x" = []
 parseTPSStack tps = stones'
   where
-    lastSType = if last tps `elem` "SC" then read [last tps] :: StoneType else F
-    chars = if lastSType /= F then init tps else tps
+    -- Stack are top to bottom
+    tps' = reverse tps
+    topSType = if head tps' `elem` "SC" then read [head tps'] :: StoneType else F
+    chars = if topSType /= F then tail tps' else tps'
     stones = map (\c -> Stone (toPlayer [c]) F) chars
-    stones' = init stones ++ map (\(Stone p _) -> Stone p lastSType) [last stones]
+    stones' = map (\(Stone p _) -> Stone p topSType) [head stones] ++ tail stones
 
