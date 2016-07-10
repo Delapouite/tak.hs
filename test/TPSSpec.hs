@@ -43,6 +43,37 @@ testsParseTPSRow = TestList
     , Cell ('c', 4) []
     , Cell ('d', 4) []
     ]
+  , TestCase $ parseTPSRow "12S,x2,2" 4 @?=
+    [ Cell ('a', 4) [Stone P2 S, Stone P1 F]
+    , Cell ('b', 4) []
+    , Cell ('c', 4) []
+    , Cell ('d', 4) [Stone P2 F]
+    ]
+  ]
+
+testsToTPSRow = TestList
+  [ TestCase $ "x3" @=? toTPSRow
+    [ Cell ('a', 2) []
+    , Cell ('b', 2) []
+    , Cell ('c', 2) []
+    ]
+  , TestCase $ "x,2,x" @=? toTPSRow
+    [ Cell ('a', 1) []
+    , Cell ('b', 1) [Stone P2 F]
+    , Cell ('c', 1) []
+    ]
+  , TestCase $ "12S,2,x2" @=? toTPSRow
+    [ Cell ('a', 4) [Stone P2 S, Stone P1 F]
+    , Cell ('b', 4) [Stone P2 F]
+    , Cell ('c', 4) []
+    , Cell ('d', 4) []
+    ]
+  , TestCase $ "12S,x2,2" @=? toTPSRow
+    [ Cell ('a', 4) [Stone P2 S, Stone P1 F]
+    , Cell ('b', 4) []
+    , Cell ('c', 4) []
+    , Cell ('b', 4) [Stone P2 F]
+    ]
   ]
 
 testsParseTPSX = TestList
@@ -52,7 +83,7 @@ testsParseTPSX = TestList
   ]
 
 testsToTPSX = TestList
-  [ TestCase $ toTPSX "x,x,x" @?= "x3"
+  [ TestCase $ toTPSX "xxx" @?= "x3"
   , TestCase $ toTPSX "x" @?= "x"
   , TestCase $ toTPSX "12S" @?= "12S"
   ]
@@ -103,6 +134,7 @@ testsToTPSPlayer = TestList
 testsTPS = TestList
   [ testsParseTPSBoard
   , testsParseTPSRow
+  , testsToTPSRow
   , testsParseTPSX
   , testsToTPSX
   , testsParseTPSCell

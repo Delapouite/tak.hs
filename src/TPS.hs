@@ -2,7 +2,7 @@ module TPS where
 
 import Data.Char (digitToInt, isAlpha, isDigit, toLower, toUpper)
 import Data.List (intercalate, intersperse)
-import Data.List.Split (splitOn)
+import Data.List.Split (splitOn, split, oneOf, condense)
 import Text.Read (readMaybe)
 
 import Tak
@@ -38,6 +38,14 @@ parseTPSRow tps y = cells
     tpsCell =  splitOn "," tpsRow
     cells = [parseTPSCell c (x, y) | (c, x) <- zip tpsCell $ take (length tpsCell) xs]
 
+toTPSRow :: Row -> String
+toTPSRow r = intercalate "," $ map toTPSX parts'
+  where
+    -- [["12S", "2"], ["x", "x"], ["2"], ["x"]]
+    parts = split (condense $ oneOf ["x"]) $ map toTPSCell r
+    -- ["12S", "2", "xx", "2", "x"]
+    parts' = concatMap (\g -> if "x" `elem` g then [concat g] else g) parts
+
 -- x5 → x,x,x,x,x
 parseTPSX :: String -> String
 parseTPSX ['x', n] = intersperse ',' $ replicate (digitToInt n) 'x'
@@ -45,7 +53,8 @@ parseTPSX tps = tps
 
 toTPSX :: String -> String
 toTPSX str
-  | ',' `elem` str = 'x' : (show . length $ filter (== 'x') str)
+  | "x" == str = "x"
+  | 'x' `elem` str = 'x' : show (length str)
   | otherwise = str
 
 parseTPSCell :: String -> XY -> Cell
