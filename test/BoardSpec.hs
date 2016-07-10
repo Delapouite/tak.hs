@@ -28,6 +28,14 @@ mockBoard =
   , Cell ('c', 3) []
   ]
 
+testsInitBoard = TestList
+  [ TestCase $ initBoard 2 @?=
+    [ Cell ('a', 1) []
+    , Cell ('a', 2) []
+    , Cell ('b', 1) []
+    , Cell ('b', 2) []
+    ]
+  ]
 
 testsGetCell = TestList
   [ TestCase $ getCell mockBoard ('a', 3) @?= Just mockCellA3
@@ -178,7 +186,8 @@ testsZipXYandCounts = TestList
   ]
 
 testsBoard = TestList
-  [ testsGetCell
+  [ testsInitBoard
+  , testsGetCell
   , testsGetCol
   , testsGetMaxHeight
   , testsGetMaxX

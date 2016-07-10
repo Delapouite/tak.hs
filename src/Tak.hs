@@ -66,9 +66,6 @@ maxSize = 8 :: Size
 -- axis
 xs = ['a'..]
 
-initBoard :: Size -> Board
-initBoard size = take (size ^ 2) [Cell (x, y) [] | x <- xs, y <- [1..size]]
-
 stoneCount :: Size -> Int
 stoneCount s = case s of
   3 -> 10

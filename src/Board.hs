@@ -9,6 +9,9 @@ import Tak
 import Cell
 import Conversion
 
+initBoard :: Size -> Board
+initBoard size = take (size ^ 2) [Cell (x, y) [] | x <- xs, y <- [1..size]]
+
 getCell :: Board -> XY -> Maybe Cell
 getCell b xy = find (\(Cell xy' _) -> xy == xy') b
 
