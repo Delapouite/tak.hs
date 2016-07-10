@@ -29,6 +29,10 @@ parseTPSBoard tps = concat [parseTPSRow r y | (r, y) <- z]
     tpsRows = splitOn "/" tps
     z = zip tpsRows $ reverse [1..(length tpsRows)]
 
+-- TODO wut? toCols
+toTPSBoard :: Board -> String
+toTPSBoard b = intercalate "/" $ map toTPSRow (toCols b)
+
 -- x5
 -- x3,12,2S
 parseTPSRow :: String -> Y -> Row

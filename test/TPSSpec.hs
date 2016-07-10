@@ -13,7 +13,43 @@ testsParseTPSBoard = TestList
     , Cell ('a', 1) []
     , Cell ('b', 1) []
     ]
+  , TestCase $ parseTPSBoard "x2/x2/1,x" @?=
+    [ Cell ('a', 3) []
+    , Cell ('b', 3) []
+    , Cell ('a', 2) []
+    , Cell ('b', 2) []
+    , Cell ('a', 1) [Stone P1 F]
+    , Cell ('b', 1) []
+    ]
   , TestCase $ parseTPSBoard "1,x,21S/x2,211/1,2C,2" @?=
+    [ Cell ('a', 3) [Stone P1 F]
+    , Cell ('b', 3) []
+    , Cell ('c', 3) [Stone P1 S, Stone P2 F]
+    , Cell ('a', 2) []
+    , Cell ('b', 2) []
+    , Cell ('c', 2) [Stone P1 F, Stone P1 F, Stone P2 F]
+    , Cell ('a', 1) [Stone P1 F]
+    , Cell ('b', 1) [Stone P2 C]
+    , Cell ('c', 1) [Stone P2 F]
+    ]
+  ]
+
+testsToTPSBoard = TestList
+  [ TestCase $ "x2/x2" @=? toTPSBoard
+    [ Cell ('a', 2) []
+    , Cell ('b', 2) []
+    , Cell ('a', 1) []
+    , Cell ('b', 1) []
+    ]
+  , TestCase $ "x2/x2/1,x" @=? toTPSBoard
+    [ Cell ('a', 3) []
+    , Cell ('b', 3) []
+    , Cell ('a', 2) []
+    , Cell ('b', 2) []
+    , Cell ('a', 1) [Stone P1 F]
+    , Cell ('b', 1) []
+    ]
+  , TestCase $ "1,x,21S/x2,211/1,2C,2" @=? toTPSBoard
     [ Cell ('a', 3) [Stone P1 F]
     , Cell ('b', 3) []
     , Cell ('c', 3) [Stone P1 S, Stone P2 F]
@@ -133,6 +169,7 @@ testsToTPSPlayer = TestList
 
 testsTPS = TestList
   [ testsParseTPSBoard
+  , testsToTPSBoard
   , testsParseTPSRow
   , testsToTPSRow
   , testsParseTPSX
