@@ -24,14 +24,14 @@ parseTPS tps = Game { size = getSize b'
     p' = toPlayer p
 
 parseTPSBoard :: String -> Board
-parseTPSBoard tps = concat [parseTPSRow r y | (r, y) <- z]
+parseTPSBoard tps = sortBoard b
   where
     tpsRows = splitOn "/" tps
     z = zip tpsRows $ reverse [1..(length tpsRows)]
+    b = concat [parseTPSRow r y | (r, y) <- z]
 
--- TODO wut? toCols
 toTPSBoard :: Board -> String
-toTPSBoard b = intercalate "/" $ map toTPSRow (toCols b)
+toTPSBoard b = intercalate "/" $ reverse $ map toTPSRow (toRows b)
 
 -- x5
 -- x3,12,2S
