@@ -159,6 +159,42 @@ testsIsBoardFull = TestList
      ]
   ]
 
+testsToCols = TestList
+  [ TestCase $ toCols
+    [ Cell ('a', 1) []
+    , Cell ('a', 2) []
+    , Cell ('b', 1) []
+    , Cell ('b', 2) []
+    ] @?=
+    [
+      [ Cell ('a', 1) []
+      , Cell ('a', 2) []
+      ]
+      ,
+      [ Cell ('b', 1) []
+      , Cell ('b', 2) []
+      ]
+    ]
+  ]
+
+testsToRows = TestList
+  [ TestCase $ toRows
+    [ Cell ('a', 1) []
+    , Cell ('a', 2) []
+    , Cell ('b', 1) []
+    , Cell ('b', 2) []
+    ] @?=
+    [
+      [ Cell ('a', 1) []
+      , Cell ('b', 1) []
+      ]
+      ,
+      [ Cell ('a', 2) []
+      , Cell ('b', 2) []
+      ]
+    ]
+  ]
+
 -- stack
 
 mockBoard1 =
@@ -224,6 +260,8 @@ testsBoard = TestList
   , testsGetSize
   , testsGetValidNeighbors
   , testsIsBoardFull
+  , testsToCols
+  , testsToRows
   , testsStackStones
   , testsUnstackStones
   , testsMoveSubstack
