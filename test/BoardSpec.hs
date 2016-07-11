@@ -37,6 +37,30 @@ testsInitBoard = TestList
     ]
   ]
 
+testsSortBoard = TestList
+  [ TestCase $ sortBoard
+    [ Cell ('b', 1) []
+    , Cell ('a', 1) []
+    , Cell ('a', 3) []
+    , Cell ('c', 3) []
+    , Cell ('b', 2) []
+    , Cell ('a', 2) []
+    , Cell ('c', 1) []
+    , Cell ('c', 2) []
+    , Cell ('b', 3) []
+    ] @?=
+    [ Cell ('a', 1) []
+    , Cell ('a', 2) []
+    , Cell ('a', 3) []
+    , Cell ('b', 1) []
+    , Cell ('b', 2) []
+    , Cell ('b', 3) []
+    , Cell ('c', 1) []
+    , Cell ('c', 2) []
+    , Cell ('c', 3) []
+    ]
+  ]
+
 testsGetCell = TestList
   [ TestCase $ getCell mockBoard ('a', 3) @?= Just mockCellA3
   , TestCase $ getCell mockBoard ('a', 4) @?= Nothing
@@ -187,6 +211,7 @@ testsZipXYandCounts = TestList
 
 testsBoard = TestList
   [ testsInitBoard
+  , testsSortBoard
   , testsGetCell
   , testsGetCol
   , testsGetMaxHeight

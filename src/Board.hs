@@ -1,7 +1,7 @@
 module Board where
 
 import Data.Char (digitToInt)
-import Data.List (find, transpose)
+import Data.List (find, sortBy, transpose)
 import Data.List.Split (chunksOf)
 import Data.Maybe (fromJust, isJust)
 
@@ -11,6 +11,14 @@ import Conversion
 
 initBoard :: Size -> Board
 initBoard size = take (size ^ 2) [Cell (x, y) [] | x <- xs, y <- [1..size]]
+
+sortBoard :: Board -> Board
+sortBoard = sortBy sorter
+  where
+    sorter (Cell (x, y) _) (Cell (x', y') _)
+      | x < x' = LT
+      | x > x' = GT
+      | x == x' = compare y y'
 
 getCell :: Board -> XY -> Maybe Cell
 getCell b xy = find (\(Cell xy' _) -> xy == xy') b
