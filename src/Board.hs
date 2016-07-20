@@ -96,29 +96,29 @@ toRows = transpose . toCols
 
 -- stack
 
-stackStones :: XY -> Stack -> Cell -> Cell
-stackStones xy stones c@(Cell xy' zs)
+pushStones :: XY -> Stack -> Cell -> Cell
+pushStones xy stones c@(Cell xy' zs)
   | xy == xy' = Cell xy (stones ++ flattenStack zs)
   | otherwise = c
 
-unstackStones :: XY -> Count -> Cell -> Cell
-unstackStones xy count c@(Cell xy' zs)
+popStones :: XY -> Count -> Cell -> Cell
+popStones xy count c@(Cell xy' zs)
   | xy == xy' = Cell xy (drop count zs)
   | otherwise = c
 
 placeStone :: Board -> XY -> Player -> StoneType -> Board
-placeStone b xy p st = map (stackStones xy [Stone p st]) b
+placeStone b xy p st = map (pushStones xy [Stone p st]) b
 
 -- turn all stones to F
 flattenStack :: Stack -> Stack
 flattenStack = map (\(Stone p t) -> (Stone p F))
 
 moveSubstack :: Board -> Count -> XY -> XY -> Board
-moveSubstack b count fromXY toXY = map (stackStones toXY stones) b'
+moveSubstack b count fromXY toXY = map (pushStones toXY stones) b'
   where
     Just (Cell _ zs) = getCell b fromXY
     stones = take count zs
-    b' = map (unstackStones fromXY count) b
+    b' = map (popStones fromXY count) b
 
 moveStack :: Board -> Move -> Board
 moveStack b m@(count, xy, dir, drops) = foldl reducer b $ zipXYandCounts m

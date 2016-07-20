@@ -204,17 +204,17 @@ mockBoard1 =
   , Cell ('b', 1) []
   ]
 
-testsStackStones = TestList
-  [ TestCase $ stackStones ('a', 1) [Stone P1 F] (Cell ('a', 2) []) @?= Cell ('a', 2) []
-  , TestCase $ stackStones ('a', 2) [Stone P1 F] (Cell ('a', 2) []) @?= Cell ('a', 2) [Stone P1 F]
-  , TestCase $ stackStones ('a', 2) [Stone P1 S, Stone P1 F] (Cell ('a', 2) []) @?= Cell ('a', 2) [Stone P1 S, Stone P1 F]
+testsPushStones = TestList
+  [ TestCase $ pushStones ('a', 1) [Stone P1 F] (Cell ('a', 2) []) @?= Cell ('a', 2) []
+  , TestCase $ pushStones ('a', 2) [Stone P1 F] (Cell ('a', 2) []) @?= Cell ('a', 2) [Stone P1 F]
+  , TestCase $ pushStones ('a', 2) [Stone P1 S, Stone P1 F] (Cell ('a', 2) []) @?= Cell ('a', 2) [Stone P1 S, Stone P1 F]
   ]
 
-testsUnstackStones = TestList
-  [ TestCase $ unstackStones ('a', 1) 1 (Cell ('a', 2) [Stone P1 C, Stone P2 F]) @?= Cell ('a', 2) [Stone P1 C, Stone P2 F]
-  , TestCase $ unstackStones ('a', 2) 1 (Cell ('a', 2) [Stone P1 C, Stone P2 F]) @?= Cell ('a', 2) [Stone P2 F]
-  , TestCase $ unstackStones ('a', 2) 2 (Cell ('a', 2) [Stone P1 C, Stone P2 F]) @?= Cell ('a', 2) []
-  , TestCase $ unstackStones ('a', 2) 2 (Cell ('a', 2) [Stone P1 C, Stone P1 F, Stone P2 F]) @?= Cell ('a', 2) [Stone P2 F]
+testsPopStones = TestList
+  [ TestCase $ popStones ('a', 1) 1 (Cell ('a', 2) [Stone P1 C, Stone P2 F]) @?= Cell ('a', 2) [Stone P1 C, Stone P2 F]
+  , TestCase $ popStones ('a', 2) 1 (Cell ('a', 2) [Stone P1 C, Stone P2 F]) @?= Cell ('a', 2) [Stone P2 F]
+  , TestCase $ popStones ('a', 2) 2 (Cell ('a', 2) [Stone P1 C, Stone P2 F]) @?= Cell ('a', 2) []
+  , TestCase $ popStones ('a', 2) 2 (Cell ('a', 2) [Stone P1 C, Stone P1 F, Stone P2 F]) @?= Cell ('a', 2) [Stone P2 F]
   ]
 
 testsMoveSubstack = TestList
@@ -262,8 +262,8 @@ testsBoard = TestList
   , testsIsBoardFull
   , testsToCols
   , testsToRows
-  , testsStackStones
-  , testsUnstackStones
+  , testsPushStones
+  , testsPopStones
   , testsMoveSubstack
   , testsZipXYandCounts
   ]
