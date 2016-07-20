@@ -13,12 +13,12 @@ initBoard :: Size -> Board
 initBoard size = take (size ^ 2) [Cell (x, y) [] | x <- xs, y <- [1..size]]
 
 sortBoard :: Board -> Board
-sortBoard = sortBy sorter
-  where
-    sorter (Cell (x, y) _) (Cell (x', y') _)
-      | x < x' = LT
-      | x > x' = GT
-      | x == x' = compare y y'
+sortBoard = let
+  sorter (Cell (x, y) _) (Cell (x', y') _)
+    | x < x' = LT
+    | x > x' = GT
+    | x == x' = compare y y'
+  in sortBy sorter
 
 getCell :: Board -> XY -> Maybe Cell
 getCell b xy = find (\(Cell xy' _) -> xy == xy') b
@@ -34,11 +34,10 @@ getMaxX b = xs !! (getSize b - 1)
 
 -- up to 4, in each direction
 getNeighbors :: Board -> XY -> [Cell]
-getNeighbors b xy = cells
-  where
-    xys = map (getNextXY xy) [North, East, South, West]
-    mCells = map (getCell b) xys
-    cells = map fromJust $ filter isJust mCells
+getNeighbors b xy = let
+  xys = map (getNextXY xy) [North, East, South, West]
+  mCells = map (getCell b) xys
+  in map fromJust $ filter isJust mCells
 
 getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
 getNextCells b (Cell xy _) dir drops = map (getCell b) $ getNextXYs xy dir drops
@@ -53,17 +52,17 @@ getNextXY (x, y) d = case d of
 
 -- beware resulting XYs can be out of bounds
 getNextXYs :: XY -> Dir -> Drops -> [XY]
-getNextXYs xy dir drops = tail $ foldl red [xy] (show drops)
-  where
-    red acc _ = acc ++ [getNextXY (last acc) dir]
+getNextXYs xy dir drops = let
+  reducer acc _ = acc ++ [getNextXY (last acc) dir]
+  in tail $ foldl reducer [xy] (show drops)
 
 getOwned :: [Cell] -> [Cell]
 getOwned = filter (not . isEmpty)
 
 getPlacedByPlayer :: Board -> Player -> [Stone]
-getPlacedByPlayer b p = concatMap getOwnStones $ getStacks b
-  where
-    getOwnStones = filter (\(Stone owner _) -> owner == p)
+getPlacedByPlayer b p = let
+  getOwnStones = filter (\(Stone owner _) -> owner == p)
+  in concatMap getOwnStones $ getStacks b
 
 getPlacedByPlayerAndType :: Board -> Player -> StoneType -> [Stone]
 getPlacedByPlayerAndType b p st = filter (\(Stone _ t) -> t == st) $ getPlacedByPlayer b p
@@ -114,21 +113,21 @@ flattenStack :: Stack -> Stack
 flattenStack = map (\(Stone p t) -> (Stone p F))
 
 moveSubstack :: Board -> Count -> XY -> XY -> Board
-moveSubstack b count fromXY toXY = map (pushStones toXY stones) b'
-  where
-    Just (Cell _ zs) = getCell b fromXY
-    stones = take count zs
-    b' = map (popStones fromXY count) b
+moveSubstack b count fromXY toXY = let
+  Just (Cell _ zs) = getCell b fromXY
+  stones = take count zs
+  b' = map (popStones fromXY count) b
+  in map (pushStones toXY stones) b'
 
 moveStack :: Board -> Move -> Board
-moveStack b m@(count, xy, dir, drops) = foldl reducer b $ zipXYandCounts m
-  where
-    reducer acc (xy, drop) = moveSubstack acc drop xy (getNextXY xy dir)
+moveStack b m@(count, xy, dir, drops) = let
+  reducer acc (xy, drop) = moveSubstack acc drop xy (getNextXY xy dir)
+  in foldl reducer b $ zipXYandCounts m
 
 zipXYandCounts :: Move -> [(XY, Count)]
-zipXYandCounts m@(count, xy, dir, drops) = zip xys counts
-  where
-    xys = init $ xy : getNextXYs xy dir drops
-    drops' = map digitToInt (show drops)
-    counts = foldl reducer [count] $ init drops'
-    reducer acc drop = acc ++ [last acc - drop]
+zipXYandCounts m@(count, xy, dir, drops) = let
+  xys = init $ xy : getNextXYs xy dir drops
+  drops' = map digitToInt (show drops)
+  counts = foldl reducer [count] $ init drops'
+  reducer acc drop = acc ++ [last acc - drop]
+  in zip xys counts

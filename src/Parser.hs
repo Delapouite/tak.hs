@@ -12,9 +12,9 @@ import Conversion
 parseCommand :: String -> Command
 -- default
 parseCommand "" = Command "show" []
-parseCommand s = Command verb args
-  where
-    (verb:args) = words s
+parseCommand s = let
+  (verb:args) = words s
+  in Command verb args
 
 parseXY :: String -> Maybe XY
 parseXY (x:y:[])

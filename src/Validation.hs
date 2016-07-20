@@ -12,9 +12,9 @@ import Conversion
 -- coordinates
 
 isValidX :: Size -> X -> Bool
-isValidX s x = x' >= 0 && x' <= s
-  where
-    x' = xToInt x
+isValidX s x = let
+  x' = xToInt x
+  in x' >= 0 && x' <= s
 
 isValidY :: Size -> Y -> Bool
 isValidY s y = y > 0 && y <= s
@@ -28,13 +28,12 @@ isValidSize s = s >= minSize && s <= maxSize
 
 -- carry limit, stack height
 isValidCount :: Game -> Move -> Bool
-isValidCount g (count, xy, _, _) =
-  count <= size g && validStackHeight
-  where
-    b = board g
-    validStackHeight = case getCell b xy of
-      Just c -> getHeight c >= count
-      Nothing -> False
+isValidCount g (count, xy, _, _) = let
+  b = board g
+  validStackHeight = case getCell b xy of
+    Just c -> getHeight c >= count
+    Nothing -> False
+  in count <= size g && validStackHeight
 
 isValidDrops :: Count -> Drops -> Bool
 isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
@@ -46,23 +45,22 @@ canPlace b xy = case getCell b xy of
   Nothing -> False
 
 capsInDeck :: Game -> Bool
-capsInDeck g = totalCaps - placedCaps > 0
-  where
-    totalCaps = capCount $ size g
-    placedCaps = length $ getPlacedByPlayerAndType (board g) (player g) C
+capsInDeck g = let
+  totalCaps = capCount $ size g
+  placedCaps = length $ getPlacedByPlayerAndType (board g) (player g) C
+  in totalCaps - placedCaps > 0
 
 checkRoad :: Board -> (Cell -> Bool) -> [Cell] -> Cell -> Bool
-checkRoad b isEnd visited c@(Cell xy _) =
-  isEnd c || any (checkRoad b isEnd (c:visited)) newNeighbors
-  where
-    newNeighbors = filter (`notElem` visited) $ getValidNeighbors b xy
+checkRoad b isEnd visited c@(Cell xy _) = let
+  newNeighbors = filter (`notElem` visited) $ getValidNeighbors b xy
+  in isEnd c || any (checkRoad b isEnd (c:visited)) newNeighbors
 
 checkHalfRoads :: Board -> (Cell -> Bool) -> [Cell] -> [Player]
-checkHalfRoads b isEnd starts = nub $ mapMaybe roadOwner starts
-  where
-    roadOwner c
-      | checkRoad b isEnd starts c = getOwner c
-      | otherwise                  = Nothing
+checkHalfRoads b isEnd starts = let
+  roadOwner c
+    | checkRoad b isEnd starts c = getOwner c
+    | otherwise                  = Nothing
+  in nub $ mapMaybe roadOwner starts
 
 checkRoads :: Game -> Maybe Display
 checkRoads g
@@ -99,18 +97,17 @@ isUnderControl g xy = case getCell (board g) xy of
     Just owner -> owner == player g
 
 isDropzoneClear :: Game -> Move -> Bool
-isDropzoneClear g (count, xy, dir, drops) = clear
-  where
-    b = board g
-    Just cell = getCell b xy
-    nextMCells = filter isJust $ getNextCells b cell dir drops
-    nextCells = map fromJust nextMCells
+isDropzoneClear g (count, xy, dir, drops) = let
+  b = board g
+  Just cell = getCell b xy
+  nextMCells = filter isJust $ getNextCells b cell dir drops
+  nextCells = map fromJust nextMCells
 
-    -- conditions
-    inBounds = length nextMCells == (length . show) drops
-    initToppable = all isToppable $ init nextCells
-    end = last nextCells
-    isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)
+  -- conditions
+  inBounds = length nextMCells == (length . show) drops
+  initToppable = all isToppable $ init nextCells
+  end = last nextCells
+  isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)
 
-    clear = inBounds && initToppable && isValidEnd
+  in inBounds && initToppable && isValidEnd
 
