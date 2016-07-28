@@ -3,7 +3,7 @@ module Board where
 import Data.Char (digitToInt)
 import Data.List (find, sortBy, transpose)
 import Data.List.Split (chunksOf)
-import Data.Maybe (fromJust, isJust)
+import Data.Maybe (catMaybes)
 
 import Tak
 import Cell
@@ -37,7 +37,7 @@ getNeighbors :: Board -> XY -> [Cell]
 getNeighbors b xy = let
   xys = map (getNextXY xy) [North, East, South, West]
   mCells = map (getCell b) xys
-  in map fromJust $ filter isJust mCells
+  in catMaybes mCells
 
 getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
 getNextCells b (Cell xy _) dir drops = map (getCell b) $ getNextXYs xy dir drops

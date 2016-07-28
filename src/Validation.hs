@@ -1,7 +1,7 @@
 module Validation where
 
 import Data.Char (digitToInt)
-import Data.Maybe (mapMaybe, isJust, fromJust)
+import Data.Maybe (mapMaybe, catMaybes)
 import Data.List (nub)
 
 import Tak
@@ -100,11 +100,10 @@ isDropzoneClear :: Game -> Move -> Bool
 isDropzoneClear g (count, xy, dir, drops) = let
   b = board g
   Just cell = getCell b xy
-  nextMCells = filter isJust $ getNextCells b cell dir drops
-  nextCells = map fromJust nextMCells
+  nextCells = catMaybes $ getNextCells b cell dir drops
 
   -- conditions
-  inBounds = length nextMCells == (length . show) drops
+  inBounds = length nextCells == (length . show) drops
   initToppable = all isToppable $ init nextCells
   end = last nextCells
   isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)
