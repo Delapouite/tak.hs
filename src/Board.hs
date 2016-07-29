@@ -27,7 +27,7 @@ getCol :: Board -> X -> Col
 getCol b x = toCols b !! xToInt x
 
 getMaxHeight :: [Cell] -> Int
-getMaxHeight cells = maximum $ map getHeight cells
+getMaxHeight = maximum . map getHeight
 
 getMaxX :: Board -> X
 getMaxX b = xs !! (getSize b - 1)
