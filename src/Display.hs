@@ -45,7 +45,7 @@ showStoneAtLevel lvl (Cell _ zs)
 -- top view
 showStack :: Stack -> ROptions Display
 showStack [] = return emptyCell
-showStack zs = showStone $ head zs
+showStack (s:ss) = showStone s
 
 showStackLevel :: [Cell] -> Int -> ROptions Display
 showStackLevel cs lvl = do
