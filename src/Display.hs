@@ -121,11 +121,11 @@ showBoardWithAxes b = do
 
 -- horizontally 5 4 3 2 1
 showYAxis :: Board -> Display
-showYAxis b = unwords $ map show $ reverse $ take (getSize b) [1..]
+showYAxis b = unwords . map show . reverse $ take (getSize b) [1..]
 
 -- a b c d e
 showXAxis :: Board -> Display
-showXAxis b = unwords $ map (: []) $ take (getSize b) xs
+showXAxis b = unwords . map (: []) $ take (getSize b) xs
 
 showDeck :: Game -> Player -> Display
 showDeck g p = let

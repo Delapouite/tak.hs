@@ -57,11 +57,13 @@ test-suite tak-test
                      , safe
                      , split
                      , ansi-wl-pprint
-  other-modules:       BoardSpec
+  other-modules:       Mock
+                     , BoardSpec
                      , CellSpec
                      , GameSpec
                      , CommandSpec
                      , ConversionSpec
+                     , DisplaySpec
                      , ParserSpec
                      , TPSSpec
                      , ValidationSpec
