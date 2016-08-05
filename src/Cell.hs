@@ -34,5 +34,5 @@ isFlattenable :: Cell -> Drops -> Bool
 isFlattenable c drops = case getTopStone c of
   Nothing -> False
   -- a cap can only flatten when alone
-  Just (Stone _ t) -> t == S && ((last . show $ drops) == '1')
+  Just (Stone _ t) -> t == S && (last drops == 1)
 

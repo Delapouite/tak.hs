@@ -30,9 +30,10 @@ testsParseMove = TestList
   , TestCase $ parseMove "2b1" @?= Nothing
   , TestCase $ parseMove "2b1!" @?= Nothing
 
-  , TestCase $ parseMove "b1+" @?= Just (1, ('b', 1), North, 1)
-  , TestCase $ parseMove "2b1>" @?= Just (2, ('b', 1), East, 2)
-  , TestCase $ parseMove "2b1>11" @?= Just (2, ('b', 1), East, 11)
+  , TestCase $ parseMove "b1+" @?= Just (1, ('b', 1), North, [1])
+  , TestCase $ parseMove "2b1>" @?= Just (2, ('b', 1), East, [2])
+  , TestCase $ parseMove "2b1>11" @?= Just (2, ('b', 1), East, [1, 1])
+  , TestCase $ parseMove "4b1-121" @?= Just (4, ('b', 1), South, [1, 2, 1])
   ]
 
 testsParseCount = TestList
@@ -46,8 +47,8 @@ testsParseDir = TestList
   ]
 
 testsParseDrops = TestList
-  [ TestCase $ parseDrops 3 "121" @?= 121
-  , TestCase $ parseDrops 3 "" @?= 3
+  [ TestCase $ parseDrops 3 "121" @?= [1, 2, 1]
+  , TestCase $ parseDrops 3 "" @?= [3]
   ]
 
 testsParser = TestList

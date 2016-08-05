@@ -36,7 +36,7 @@ isValidCount g (count, xy, _, _) = let
   in count <= size g && validStackHeight
 
 isValidDrops :: Count -> Drops -> Bool
-isValidDrops c d = c == d || c == (sum . map digitToInt . show) d
+isValidDrops c d = c == sum d
 
 -- only in empty cells
 canPlace :: Board -> XY -> Bool
@@ -103,7 +103,7 @@ isDropzoneClear g (count, xy, dir, drops) = let
   nextCells = catMaybes $ getNextCells b cell dir drops
 
   -- conditions
-  inBounds = length nextCells == (length . show) drops
+  inBounds = length nextCells == length drops
   initToppable = all isToppable $ init nextCells
   end = last nextCells
   isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)

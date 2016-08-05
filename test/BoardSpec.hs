@@ -106,11 +106,11 @@ testsGetNextXY = TestList
   ]
 
 testsGetNextXYs = TestList
-  [ TestCase $ getNextXYs ('b', 2) East 1 @?= [('c', 2)]
-  , TestCase $ getNextXYs ('b', 2) East 2 @?= [('c', 2)]
-  , TestCase $ getNextXYs ('b', 2) East 21 @?= [('c', 2), ('d', 2)]
-  , TestCase $ getNextXYs ('b', 2) North 21 @?= [('b', 3), ('b', 4)]
-  , TestCase $ getNextXYs ('b', 2) North 212 @?= [('b', 3), ('b', 4), ('b', 5)]
+  [ TestCase $ getNextXYs ('b', 2) East [1] @?= [('c', 2)]
+  , TestCase $ getNextXYs ('b', 2) East [2] @?= [('c', 2)]
+  , TestCase $ getNextXYs ('b', 2) East [2, 1] @?= [('c', 2), ('d', 2)]
+  , TestCase $ getNextXYs ('b', 2) North [2, 1] @?= [('b', 3), ('b', 4)]
+  , TestCase $ getNextXYs ('b', 2) North [2, 1, 2] @?= [('b', 3), ('b', 4), ('b', 5)]
   ]
 
 testsGetOwned = TestList
@@ -239,10 +239,11 @@ testsMoveSubstack = TestList
   ]
 
 testsZipXYandCounts = TestList
-  [ TestCase $ zipXYandCounts (1, ('b', 2), East, 1) @?= [(('b', 2), 1)]
-  , TestCase $ zipXYandCounts (3, ('b', 2), East, 21) @?= [(('b', 2), 3), (('c', 2), 1)]
-  , TestCase $ zipXYandCounts (3, ('b', 2), East, 111) @?= [(('b', 2), 3), (('c', 2), 2), (('d', 2), 1)]
-  , TestCase $ zipXYandCounts (4, ('b', 2), East, 121) @?= [(('b', 2), 4), (('c', 2), 3), (('d', 2), 1)]
+  [ TestCase $ zipXYandCounts (1, ('b', 2), East, [1]) @?= [(('b', 2), 1)]
+  , TestCase $ zipXYandCounts (3, ('b', 2), East, [2, 1]) @?= [(('b', 2), 3), (('c', 2), 1)]
+  , TestCase $ zipXYandCounts (3, ('b', 2), North, [2, 1]) @?= [(('b', 2), 3), (('b', 3), 1)]
+  , TestCase $ zipXYandCounts (3, ('b', 2), East, [1, 1, 1]) @?= [(('b', 2), 3), (('c', 2), 2), (('d', 2), 1)]
+  , TestCase $ zipXYandCounts (4, ('b', 2), East, [1, 2, 1]) @?= [(('b', 2), 4), (('c', 2), 3), (('d', 2), 1)]
   ]
 
 testsBoard = TestList

@@ -20,8 +20,12 @@ data StoneType = F | S | C deriving (Eq, Show, Read)
 -- P1 in UpperCase, P2 in LowerCase
 data Stone = Stone Player StoneType deriving (Eq, Show)
 
+-- TODO proper boundaries
+-- [3..8]
 type Size = Int
+-- ['a'..'h']
 type X = Char
+-- [1..8]
 type Y = Int
 type XY = (X, Y)
 
@@ -34,8 +38,10 @@ type Board = [Cell]
 type Col = [Cell]
 type Row = [Cell]
 
+-- default to 1
 type Count = Int
-type Drops = Int
+-- default to [Count]
+type Drops = [Int]
 type Move = (Count, XY, Dir, Drops)
 
 -- PTN: + > - <

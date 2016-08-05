@@ -30,10 +30,10 @@ testsCanPlace = TestList
   ]
 
 testsIsValidDrops = TestList
-  [ TestCase $ isValidDrops 3 3 @?= True
-  , TestCase $ isValidDrops 4 3 @?= False
-  , TestCase $ isValidDrops 4 121 @?= True
-  , TestCase $ isValidDrops 4 122 @?= False
+  [ TestCase $ isValidDrops 3 [3] @?= True
+  , TestCase $ isValidDrops 4 [3] @?= False
+  , TestCase $ isValidDrops 4 [1, 2, 1] @?= True
+  , TestCase $ isValidDrops 4 [1, 2, 2] @?= False
   ]
 
 testsValidation = TestList

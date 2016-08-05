@@ -60,8 +60,8 @@ parseDir c = case c of
 
 parseDrops :: Count -> String -> Drops
 parseDrops c str = case reads str :: [(Int, String)] of
-  [(drops, _)] -> drops
-  [] -> c
+  [(drops, _)] -> map digitToInt $ show drops
+  [] -> [c]
 
 parseUnknownVerb :: Verb -> Maybe Command
 parseUnknownVerb v

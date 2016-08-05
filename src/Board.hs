@@ -1,6 +1,5 @@
 module Board where
 
-import Data.Char (digitToInt)
 import Data.List (find, sortBy, transpose)
 import Data.List.Split (chunksOf)
 import Data.Maybe (catMaybes)
@@ -54,7 +53,7 @@ getNextXY (x, y) d = case d of
 getNextXYs :: XY -> Dir -> Drops -> [XY]
 getNextXYs xy dir drops = let
   reducer acc _ = acc ++ [getNextXY (last acc) dir]
-  in tail $ foldl reducer [xy] (show drops)
+  in tail $ foldl reducer [xy] drops
 
 getOwned :: [Cell] -> [Cell]
 getOwned = filter (not . isEmpty)
@@ -120,14 +119,13 @@ moveSubstack b count fromXY toXY = let
   in map (pushStones toXY stones) b'
 
 moveStack :: Board -> Move -> Board
-moveStack b m@(count, xy, dir, drops) = let
+moveStack b m@(count, xy, dir, _) = let
   reducer acc (xy, drop) = moveSubstack acc drop xy (getNextXY xy dir)
   in foldl reducer b $ zipXYandCounts m
 
 zipXYandCounts :: Move -> [(XY, Count)]
-zipXYandCounts m@(count, xy, dir, drops) = let
+zipXYandCounts (count, xy, dir, drops) = let
   xys = init $ xy : getNextXYs xy dir drops
-  drops' = map digitToInt (show drops)
-  counts = foldl reducer [count] $ init drops'
+  counts = foldl reducer [count] $ init drops
   reducer acc drop = acc ++ [last acc - drop]
   in zip xys counts
