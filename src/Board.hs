@@ -32,29 +32,29 @@ getMaxHeight = maximum . map getHeight
 -- up to 4, in each direction
 getNeighbors :: Board -> XY -> [Cell]
 getNeighbors b xy = let
-  xys = mapMaybe (getNextXY xy) [North, East, South, West]
+  xys = mapMaybe (getNextXY (getSize b) xy) [North, East, South, West]
   in mapMaybe (getCell b) xys
 
 getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
-getNextCells b (Cell xy _) dir drops = map (getCell b) $ getNextXYs xy dir drops
+getNextCells b (Cell xy _) dir drops =
+  map (getCell b) $ getNextXYs (getSize b) xy dir drops
 
--- beware resulting XY can be out of bounds
-getNextXY :: XY -> Dir -> Maybe XY
-getNextXY (x, y) d = let
+getNextXY :: Size -> XY -> Dir -> Maybe XY
+getNextXY s (x, y) d = let
   xy = case d of
     North -> (x, succ y)
     East  -> (succ x, y)
     South -> (x, pred y)
     West  -> (pred x, y)
-  in Just xy
+  in if isValidXY s xy then Just xy else Nothing
 
-getNextXYs :: XY -> Dir -> Drops -> [XY]
-getNextXYs xy dir [d] = case getNextXY xy dir of
+getNextXYs :: Size -> XY -> Dir -> Drops -> [XY]
+getNextXYs s xy dir [d] = case getNextXY s xy dir of
   Just xy' -> [xy']
   Nothing -> []
-getNextXYs xy dir (d:ds) = let
-  [xy'] = getNextXYs xy dir [d]
-  in xy' : getNextXYs xy' dir ds
+getNextXYs s xy dir (d:ds) = let
+  [xy'] = getNextXYs s xy dir [d]
+  in xy' : getNextXYs s xy' dir ds
 
 getOwned :: [Cell] -> [Cell]
 getOwned = filter (not . isEmpty)
@@ -121,14 +121,15 @@ moveSubstack b count fromXY toXY = let
 
 moveStack :: Board -> Move -> Board
 moveStack b m@(_, xy, dir, _) = let
-  reducer acc (xy, drop) = case getNextXY xy dir of
+  size = getSize b
+  reducer acc (xy, drop) = case getNextXY size xy dir of
     Just xy' -> moveSubstack acc drop xy xy'
     Nothing -> acc
-  in foldl reducer b $ zipXYandCounts m
+  in foldl reducer b $ zipXYandCounts size m
 
-zipXYandCounts :: Move -> [(XY, Count)]
-zipXYandCounts (count, xy, dir, drops) = let
+zipXYandCounts :: Size -> Move -> [(XY, Count)]
+zipXYandCounts s (count, xy, dir, drops) = let
   reducer acc drop = acc ++ [last acc - drop]
-  xys = init $ xy : getNextXYs xy dir drops
+  xys = init $ xy : getNextXYs s xy dir drops
   counts = foldl reducer [count] $ init drops
   in zip xys counts

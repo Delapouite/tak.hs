@@ -8,6 +8,7 @@ import Tak
 import Board
 import Display
 
+mockSize = 5
 
 testsInitBoard = TestList
   [ TestCase $ initBoard 2 @?=
@@ -77,18 +78,25 @@ testsGetNeighbors = TestList
   ]
 
 testsGetNextXY = TestList
-  [ TestCase $ getNextXY ('b', 2) North @?= Just ('b', 3)
-  , TestCase $ getNextXY ('b', 2) East  @?= Just ('c', 2)
-  , TestCase $ getNextXY ('b', 2) South @?= Just ('b', 1)
-  , TestCase $ getNextXY ('b', 2) West  @?= Just ('a', 2)
+  [ TestCase $ getNextXY mockSize ('b', 2) North @?= Just ('b', 3)
+  , TestCase $ getNextXY mockSize ('b', 2) East  @?= Just ('c', 2)
+  , TestCase $ getNextXY mockSize ('b', 2) South @?= Just ('b', 1)
+  , TestCase $ getNextXY mockSize ('b', 2) West  @?= Just ('a', 2)
+  , TestCase $ getNextXY mockSize ('a', 1) West  @?= Nothing
+  , TestCase $ getNextXY mockSize ('a', 1) South @?= Nothing
+  , TestCase $ getNextXY mockSize ('e', 5) North @?= Nothing
+  , TestCase $ getNextXY mockSize ('e', 5) East  @?= Nothing
   ]
 
 testsGetNextXYs = TestList
-  [ TestCase $ getNextXYs ('b', 2) East [1] @?= [('c', 2)]
-  , TestCase $ getNextXYs ('b', 2) East [2] @?= [('c', 2)]
-  , TestCase $ getNextXYs ('b', 2) East [2, 1] @?= [('c', 2), ('d', 2)]
-  , TestCase $ getNextXYs ('b', 2) North [2, 1] @?= [('b', 3), ('b', 4)]
-  , TestCase $ getNextXYs ('b', 2) North [2, 1, 2] @?= [('b', 3), ('b', 4), ('b', 5)]
+  [ TestCase $ getNextXYs mockSize ('b', 2) East [1] @?= [('c', 2)]
+  , TestCase $ getNextXYs mockSize ('b', 2) East [2] @?= [('c', 2)]
+  , TestCase $ getNextXYs mockSize ('b', 2) East [2, 1] @?= [('c', 2), ('d', 2)]
+  , TestCase $ getNextXYs mockSize ('b', 2) North [2, 1] @?= [('b', 3), ('b', 4)]
+  , TestCase $ getNextXYs mockSize ('b', 2) North [2, 1, 2] @?= [('b', 3), ('b', 4), ('b', 5)]
+  -- out of bounds
+  , TestCase $ getNextXYs mockSize ('b', 2) South [2, 1] @?= [('b', 1)]
+  , TestCase $ getNextXYs mockSize ('b', 2) North [2, 1, 2, 1] @?= [('b', 3), ('b', 4), ('b', 5)]
   ]
 
 testsGetOwned = TestList
@@ -217,11 +225,11 @@ testsMoveSubstack = TestList
   ]
 
 testsZipXYandCounts = TestList
-  [ TestCase $ zipXYandCounts (1, ('b', 2), East, [1]) @?= [(('b', 2), 1)]
-  , TestCase $ zipXYandCounts (3, ('b', 2), East, [2, 1]) @?= [(('b', 2), 3), (('c', 2), 1)]
-  , TestCase $ zipXYandCounts (3, ('b', 2), North, [2, 1]) @?= [(('b', 2), 3), (('b', 3), 1)]
-  , TestCase $ zipXYandCounts (3, ('b', 2), East, [1, 1, 1]) @?= [(('b', 2), 3), (('c', 2), 2), (('d', 2), 1)]
-  , TestCase $ zipXYandCounts (4, ('b', 2), East, [1, 2, 1]) @?= [(('b', 2), 4), (('c', 2), 3), (('d', 2), 1)]
+  [ TestCase $ zipXYandCounts mockSize (1, ('b', 2), East, [1]) @?= [(('b', 2), 1)]
+  , TestCase $ zipXYandCounts mockSize (3, ('b', 2), East, [2, 1]) @?= [(('b', 2), 3), (('c', 2), 1)]
+  , TestCase $ zipXYandCounts mockSize (3, ('b', 2), North, [2, 1]) @?= [(('b', 2), 3), (('b', 3), 1)]
+  , TestCase $ zipXYandCounts mockSize (3, ('b', 2), East, [1, 1, 1]) @?= [(('b', 2), 3), (('c', 2), 2), (('d', 2), 1)]
+  , TestCase $ zipXYandCounts mockSize (4, ('b', 2), East, [1, 2, 1]) @?= [(('b', 2), 4), (('c', 2), 3), (('d', 2), 1)]
   ]
 
 testsBoard = TestList
