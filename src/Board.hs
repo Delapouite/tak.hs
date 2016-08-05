@@ -7,6 +7,7 @@ import Data.Maybe (catMaybes)
 import Tak
 import Cell
 import Conversion
+import XY
 
 initBoard :: Size -> Board
 initBoard size = take (size ^ 2) [Cell (x, y) [] | x <- xs, y <- [1..size]]

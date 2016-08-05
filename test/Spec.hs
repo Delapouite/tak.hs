@@ -9,6 +9,7 @@ import GameSpec
 import ParserSpec
 import TPSSpec
 import ValidationSpec
+import XYSpec
 
 main :: IO Counts
 main = runTestTT $ TestList
@@ -21,4 +22,5 @@ main = runTestTT $ TestList
   , testsParser
   , testsTPS
   , testsValidation
+  , testsXY
   ]

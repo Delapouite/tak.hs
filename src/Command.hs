@@ -9,6 +9,7 @@ import Display
 import Game
 import Parser
 import Validation
+import XY
 
 handleShow :: Game -> Either X Y -> (Game, Display)
 handleShow g xory = case xory of
