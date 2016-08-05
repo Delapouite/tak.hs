@@ -77,10 +77,10 @@ testsGetNeighbors = TestList
   ]
 
 testsGetNextXY = TestList
-  [ TestCase $ getNextXY ('b', 2) North @?= ('b', 3)
-  , TestCase $ getNextXY ('b', 2) East  @?= ('c', 2)
-  , TestCase $ getNextXY ('b', 2) South @?= ('b', 1)
-  , TestCase $ getNextXY ('b', 2) West  @?= ('a', 2)
+  [ TestCase $ getNextXY ('b', 2) North @?= Just ('b', 3)
+  , TestCase $ getNextXY ('b', 2) East  @?= Just ('c', 2)
+  , TestCase $ getNextXY ('b', 2) South @?= Just ('b', 1)
+  , TestCase $ getNextXY ('b', 2) West  @?= Just ('a', 2)
   ]
 
 testsGetNextXYs = TestList

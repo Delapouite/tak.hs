@@ -2,7 +2,7 @@ module Board where
 
 import Data.List (find, sortBy, transpose)
 import Data.List.Split (chunksOf)
-import Data.Maybe (catMaybes)
+import Data.Maybe (mapMaybe)
 
 import Tak
 import Cell
@@ -32,26 +32,29 @@ getMaxHeight = maximum . map getHeight
 -- up to 4, in each direction
 getNeighbors :: Board -> XY -> [Cell]
 getNeighbors b xy = let
-  xys = map (getNextXY xy) [North, East, South, West]
-  mCells = map (getCell b) xys
-  in catMaybes mCells
+  xys = mapMaybe (getNextXY xy) [North, East, South, West]
+  in mapMaybe (getCell b) xys
 
 getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
 getNextCells b (Cell xy _) dir drops = map (getCell b) $ getNextXYs xy dir drops
 
 -- beware resulting XY can be out of bounds
-getNextXY :: XY -> Dir -> XY
-getNextXY (x, y) d = case d of
-  North -> (x, succ y)
-  East  -> (succ x, y)
-  South -> (x, pred y)
-  West  -> (pred x, y)
+getNextXY :: XY -> Dir -> Maybe XY
+getNextXY (x, y) d = let
+  xy = case d of
+    North -> (x, succ y)
+    East  -> (succ x, y)
+    South -> (x, pred y)
+    West  -> (pred x, y)
+  in Just xy
 
--- beware resulting XYs can be out of bounds
 getNextXYs :: XY -> Dir -> Drops -> [XY]
-getNextXYs xy dir drops = let
-  reducer acc _ = acc ++ [getNextXY (last acc) dir]
-  in tail $ foldl reducer [xy] drops
+getNextXYs xy dir [d] = case getNextXY xy dir of
+  Just xy' -> [xy']
+  Nothing -> []
+getNextXYs xy dir (d:ds) = let
+  [xy'] = getNextXYs xy dir [d]
+  in xy' : getNextXYs xy' dir ds
 
 getOwned :: [Cell] -> [Cell]
 getOwned = filter (not . isEmpty)
@@ -117,13 +120,15 @@ moveSubstack b count fromXY toXY = let
   in map (pushStones toXY stones) b'
 
 moveStack :: Board -> Move -> Board
-moveStack b m@(count, xy, dir, _) = let
-  reducer acc (xy, drop) = moveSubstack acc drop xy (getNextXY xy dir)
+moveStack b m@(_, xy, dir, _) = let
+  reducer acc (xy, drop) = case getNextXY xy dir of
+    Just xy' -> moveSubstack acc drop xy xy'
+    Nothing -> acc
   in foldl reducer b $ zipXYandCounts m
 
 zipXYandCounts :: Move -> [(XY, Count)]
 zipXYandCounts (count, xy, dir, drops) = let
+  reducer acc drop = acc ++ [last acc - drop]
   xys = init $ xy : getNextXYs xy dir drops
   counts = foldl reducer [count] $ init drops
-  reducer acc drop = acc ++ [last acc - drop]
   in zip xys counts
