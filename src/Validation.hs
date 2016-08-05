@@ -12,9 +12,7 @@ import Conversion
 -- coordinates
 
 isValidX :: Size -> X -> Bool
-isValidX s x = let
-  x' = xToInt x
-  in x' >= 0 && x' <= s
+isValidX s x = x `elem` take s xs
 
 isValidY :: Size -> Y -> Bool
 isValidY s y = y > 0 && y <= s
