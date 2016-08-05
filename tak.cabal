@@ -23,6 +23,7 @@ library
                      , Display
                      , Game
                      , Parser
+                     , Stack
                      , TPS
                      , Validation
                      , XY
@@ -66,6 +67,7 @@ test-suite tak-test
                      , ConversionSpec
                      , DisplaySpec
                      , ParserSpec
+                     , StackSpec
                      , TPSSpec
                      , ValidationSpec
                      , XYSpec

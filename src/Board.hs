@@ -7,6 +7,7 @@ import Data.Maybe (mapMaybe)
 import Tak
 import Cell
 import Conversion
+import Stack
 import XY
 
 initBoard :: Size -> Board
@@ -95,22 +96,8 @@ toRows = transpose . toCols
 
 -- stack
 
-pushStones :: XY -> Stack -> Cell -> Cell
-pushStones xy stones c@(Cell xy' zs)
-  | xy == xy' = Cell xy (stones ++ flattenStack zs)
-  | otherwise = c
-
-popStones :: XY -> Count -> Cell -> Cell
-popStones xy count c@(Cell xy' zs)
-  | xy == xy' = Cell xy (drop count zs)
-  | otherwise = c
-
 placeStone :: Board -> XY -> Player -> StoneType -> Board
 placeStone b xy p st = map (pushStones xy [Stone p st]) b
-
--- turn all stones to F
-flattenStack :: Stack -> Stack
-flattenStack = map (\(Stone p t) -> (Stone p F))
 
 moveSubstack :: Board -> Count -> XY -> XY -> Board
 moveSubstack b count fromXY toXY = let
