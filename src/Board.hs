@@ -28,9 +28,6 @@ getCol b x = toCols b !! xToInt x
 getMaxHeight :: [Cell] -> Int
 getMaxHeight = maximum . map getHeight
 
-getMaxX :: Board -> X
-getMaxX b = xs !! (getSize b - 1)
-
 -- up to 4, in each direction
 getNeighbors :: Board -> XY -> [Cell]
 getNeighbors b xy = let

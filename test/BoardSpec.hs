@@ -77,9 +77,6 @@ testsGetCol = TestList
 testsGetMaxHeight = TestList
   [ TestCase $ getMaxHeight [mockCellB3, mockCellC4] @?= 3 ]
 
-testsGetMaxX = TestList
-  [ TestCase $ getMaxX mockBoard @?= 'c' ]
-
 testsGetNeighbors = TestList
   [ TestCase $ getNeighbors mockBoard ('a', 1) @?=
     [ mockCellA2
@@ -252,7 +249,6 @@ testsBoard = TestList
   , testsGetCell
   , testsGetCol
   , testsGetMaxHeight
-  , testsGetMaxX
   , testsGetNeighbors
   , testsGetNextXY
   , testsGetNextXYs

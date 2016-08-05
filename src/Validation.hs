@@ -70,7 +70,7 @@ checkRoads g
     b = board g
     -- horizontal (West → East): col a → col maxX
     hStarts = getOwned $ getCol b 'a'
-    hIsEnd (Cell (x, _) _) = x == getMaxX b
+    hIsEnd (Cell (x, _) _) = x == xs !! (size g - 1)
     hRoadOwners = checkHalfRoads b hIsEnd hStarts
     -- vertical (South → North): row 1 → row maxY
     vStarts = getOwned $ getRow b 1
