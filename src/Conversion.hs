@@ -9,9 +9,9 @@ xToInt :: X -> Int
 xToInt x = ord x - 97
 
 toXorY :: String -> Either X Y
-toXorY arg
-  | isDigit $ head arg = Right (read [head arg] :: Int)
-  | otherwise          = Left (head arg)
+toXorY (h:_)
+  | isDigit h = Right (read [h] :: Int)
+  | otherwise = Left h
 
 toStoneType :: String -> StoneType
 toStoneType str = read (map toUpper str) :: StoneType

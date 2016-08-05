@@ -11,6 +11,7 @@ testsXtoInt = TestList
 testsToXorY = TestList
   [ TestCase $ toXorY "c" @?= Left 'c'
   , TestCase $ toXorY "4" @?= Right 4
+  , TestCase $ toXorY "bdummy" @?= Left 'b'
   ]
 
 testsToStoneType = TestList
