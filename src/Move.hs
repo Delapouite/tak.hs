@@ -35,7 +35,7 @@ isDropzoneClear b (count, xy, dir, drops) = case getCell b xy of
     -- conditions
     inBounds = length nextCells == length drops
     initToppable = all isToppable $ init nextCells
-    isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)
+    isValidEnd = isToppable end || (isCapped cell && isFlattenable end drops)
 
     in inBounds && initToppable && isValidEnd
 

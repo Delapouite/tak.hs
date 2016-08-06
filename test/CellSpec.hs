@@ -37,15 +37,15 @@ testsGetTopStone = TestList
   , TestCase $ getTopStone (Cell mockXY [Stone P2 C, Stone P1 F]) @?= Just (Stone P2 C)
   ]
 
-testsHasCap = TestList
-  [ TestCase $ hasCap (Cell mockXY []) @?= False
-  , TestCase $ hasCap (Cell mockXY [Stone P1 S]) @?= False
-  , TestCase $ hasCap (Cell mockXY [Stone P1 C]) @?= True
-  ]
-
 testsIsEmpty = TestList
   [ TestCase $ isEmpty (Cell mockXY []) @?= True
   , TestCase $ isEmpty (Cell mockXY [Stone P1 F]) @?= False
+  ]
+
+testsIsCapped = TestList
+  [ TestCase $ isCapped (Cell mockXY []) @?= False
+  , TestCase $ isCapped (Cell mockXY [Stone P1 S]) @?= False
+  , TestCase $ isCapped (Cell mockXY [Stone P1 C]) @?= True
   ]
 
 testsIsToppable = TestList
@@ -71,8 +71,8 @@ testsCell = TestList
   , testsIsOwnedBy
   , testsGetHeight
   , testsGetTopStone
-  , testsHasCap
   , testsIsEmpty
+  , testsIsCapped
   , testsIsToppable
   , testsIsFlattenable
   ]

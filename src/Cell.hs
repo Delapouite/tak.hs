@@ -23,14 +23,15 @@ getTopStone :: Cell -> Maybe Stone
 getTopStone (Cell _ []) = Nothing
 getTopStone (Cell _ (s:_)) = Just s
 
--- C on top of stack
-hasCap :: Cell -> Bool
-hasCap c = case getTopStone c of
-  Just (Stone _ t) -> t == C
-  Nothing -> False
-
+-- no stones
 isEmpty :: Cell -> Bool
 isEmpty (Cell _ zs) = null zs
+
+-- C on top of stack
+isCapped :: Cell -> Bool
+isCapped c = case getTopStone c of
+  Just (Stone _ t) -> t == C
+  Nothing -> False
 
 -- F or empty cell
 isToppable :: Cell -> Bool
