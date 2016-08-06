@@ -18,8 +18,8 @@ isValidDrops :: Count -> Drops -> Bool
 isValidDrops c d = c == sum d
 
 -- only move stacks owned by current p
-isUnderControl :: Board -> Player -> XY -> Bool
-isUnderControl b p xy = case getCell b xy of
+isValidOwner :: Board -> Player -> XY -> Bool
+isValidOwner b p xy = case getCell b xy of
   Nothing -> False
   Just c -> case getOwner c of
     Nothing -> False

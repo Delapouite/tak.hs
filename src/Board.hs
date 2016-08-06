@@ -83,7 +83,7 @@ getValidNeighbors b xy = case getCell b xy of
   Nothing -> []
   Just cell -> case getOwner cell of
     Nothing -> []
-    Just owner -> filter (\c -> getOwner c == Just owner) $ getNeighbors b xy
+    Just owner -> filter (isOwnedBy owner) $ getNeighbors b xy
 
 isBoardFull :: Board -> Bool
 isBoardFull = not . any isEmpty

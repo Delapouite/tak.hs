@@ -33,7 +33,7 @@ handlePlace g@Game {board = b, size = s} xy st
 handleMove :: Game -> Move -> (Game, Display)
 handleMove g@Game {board = b, player = p} m@(count, xy, dir, drops)
   | not $ isValidXY (size g) xy    = (g, "Wrong xy coordinates")
-  | not $ isUnderControl b p xy    = (g, "You do not control the cell")
+  | not $ isValidOwner b p xy      = (g, "You do not own the cell")
   | not $ isValidCount b m         = (g, "Wrong count")
   | not $ isValidDrops count drops = (g, "Wrong drops")
   | not $ isDropzoneClear b m      = (g, "The dropzone is not clear")

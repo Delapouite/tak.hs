@@ -2,13 +2,22 @@ module Cell where
 
 import Tak
 
-getHeight :: Cell -> Int
-getHeight (Cell _ zs) = length zs
+-- associated player
 
 getOwner :: Cell -> Maybe Player
 getOwner c = case getTopStone c of
   Just (Stone owner _) -> Just owner
   Nothing -> Nothing
+
+isOwnedBy :: Player -> Cell -> Bool
+isOwnedBy p c = case getOwner c of
+  Just owner -> owner == p
+  Nothing -> False
+
+-- associated stack
+--
+getHeight :: Cell -> Int
+getHeight (Cell _ zs) = length zs
 
 getTopStone :: Cell -> Maybe Stone
 getTopStone (Cell _ []) = Nothing

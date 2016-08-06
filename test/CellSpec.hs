@@ -6,66 +6,71 @@ import Tak
 import Cell
 import Display
 
-mockStackS1 = [Stone P1 S, Stone P2 F, Stone P1 F]
-mockStackC1 = [Stone P1 C, Stone P2 F]
-mockStackF2 = [Stone P2 F]
+mockXY = ('a', 1)
 
-mockCellA1 = Cell ('a', 1) mockStackS1
-mockCellA2 = Cell ('a', 2) mockStackS1
-mockCellA3 = Cell ('a', 3) mockStackF2
-mockCellB3 = Cell ('b', 3) mockStackS1
-mockCellC4 = Cell ('c', 4) mockStackC1
-
-testsGetHeight = TestList
-  [ TestCase $ getHeight mockCellB3 @?= 3
-  , TestCase $ getHeight mockCellC4 @?= 2
-  ]
+-- associated player
 
 testsGetOwner = TestList
-  [ TestCase $ getOwner (Cell ('b', 2) []) @?= Nothing
-  , TestCase $ getOwner (Cell ('b', 2) [Stone P1 F]) @?= Just P1
-  , TestCase $ getOwner (Cell ('b', 2) [Stone P2 S, Stone P1 F]) @?= Just P2
+  [ TestCase $ getOwner (Cell mockXY []) @?= Nothing
+  , TestCase $ getOwner (Cell mockXY [Stone P1 F]) @?= Just P1
+  , TestCase $ getOwner (Cell mockXY [Stone P2 S, Stone P1 F]) @?= Just P2
+  ]
+
+testsIsOwnedBy = TestList
+  [ TestCase $ isOwnedBy P1 (Cell mockXY []) @?= False
+  , TestCase $ isOwnedBy P1 (Cell mockXY [Stone P1 F]) @?= True
+  , TestCase $ isOwnedBy P2 (Cell mockXY [Stone P2 S, Stone P1 F]) @?= True
+  , TestCase $ isOwnedBy P1 (Cell mockXY [Stone P2 S, Stone P1 F]) @?= False
+  ]
+
+-- associated stack
+
+testsGetHeight = TestList
+  [ TestCase $ getHeight (Cell mockXY []) @?= 0
+  , TestCase $ getHeight (Cell mockXY [Stone P1 F, Stone P2 F]) @?= 2
+  , TestCase $ getHeight (Cell mockXY [Stone P1 C, Stone P1 F, Stone P2 F]) @?= 3
   ]
 
 testsGetTopStone = TestList
-  [ TestCase $ getTopStone (Cell ('b', 2) []) @?= Nothing
-  , TestCase $ getTopStone (Cell ('b', 2) [Stone P1 F]) @?= Just (Stone P1 F)
-  , TestCase $ getTopStone (Cell ('b', 2) [Stone P2 C, Stone P1 F]) @?= Just (Stone P2 C)
+  [ TestCase $ getTopStone (Cell mockXY []) @?= Nothing
+  , TestCase $ getTopStone (Cell mockXY [Stone P1 F]) @?= Just (Stone P1 F)
+  , TestCase $ getTopStone (Cell mockXY [Stone P2 C, Stone P1 F]) @?= Just (Stone P2 C)
   ]
 
 testsHasCap = TestList
-  [ TestCase $ hasCap (Cell ('a', 1) []) @?= False
-  , TestCase $ hasCap (Cell ('a', 1) [Stone P1 S]) @?= False
-  , TestCase $ hasCap (Cell ('a', 1) [Stone P1 C]) @?= True
+  [ TestCase $ hasCap (Cell mockXY []) @?= False
+  , TestCase $ hasCap (Cell mockXY [Stone P1 S]) @?= False
+  , TestCase $ hasCap (Cell mockXY [Stone P1 C]) @?= True
   ]
 
 testsIsEmpty = TestList
-  [ TestCase $ isEmpty (Cell ('a', 1) []) @?= True
-  , TestCase $ isEmpty (Cell ('a', 1) [Stone P1 F]) @?= False
+  [ TestCase $ isEmpty (Cell mockXY []) @?= True
+  , TestCase $ isEmpty (Cell mockXY [Stone P1 F]) @?= False
   ]
 
 testsIsToppable = TestList
-  [ TestCase $ isToppable (Cell ('a', 1) []) @?= True
-  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 F]) @?= True
-  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 F, Stone P1 F]) @?= True
-  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 S, Stone P1 F]) @?= False
-  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 S]) @?= False
-  , TestCase $ isToppable (Cell ('a', 1) [Stone P1 C]) @?= False
+  [ TestCase $ isToppable (Cell mockXY []) @?= True
+  , TestCase $ isToppable (Cell mockXY [Stone P1 F]) @?= True
+  , TestCase $ isToppable (Cell mockXY [Stone P1 F, Stone P1 F]) @?= True
+  , TestCase $ isToppable (Cell mockXY [Stone P1 S, Stone P1 F]) @?= False
+  , TestCase $ isToppable (Cell mockXY [Stone P1 S]) @?= False
+  , TestCase $ isToppable (Cell mockXY [Stone P1 C]) @?= False
   ]
 
 testsIsFlattenable = TestList
-  [ TestCase $ isFlattenable (Cell ('a', 1) []) [1] @?= False
-  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 F]) [1] @?= False
-  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 C]) [1] @?= False
-  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 S]) [2] @?= False
-  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 S]) [1] @?= True
-  , TestCase $ isFlattenable (Cell ('a', 1) [Stone P1 S]) [1, 1, 1] @?= True
+  [ TestCase $ isFlattenable (Cell mockXY []) [1] @?= False
+  , TestCase $ isFlattenable (Cell mockXY [Stone P1 F]) [1] @?= False
+  , TestCase $ isFlattenable (Cell mockXY [Stone P1 C]) [1] @?= False
+  , TestCase $ isFlattenable (Cell mockXY [Stone P1 S]) [2] @?= False
+  , TestCase $ isFlattenable (Cell mockXY [Stone P1 S]) [1] @?= True
+  , TestCase $ isFlattenable (Cell mockXY [Stone P1 S]) [1, 1, 1] @?= True
   ]
 
 testsCell = TestList
-  [ testsGetHeight
+  [ testsGetOwner
+  , testsIsOwnedBy
+  , testsGetHeight
   , testsGetTopStone
-  , testsGetOwner
   , testsHasCap
   , testsIsEmpty
   , testsIsToppable

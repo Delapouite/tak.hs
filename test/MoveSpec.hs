@@ -24,6 +24,12 @@ testsIsValidDrops = TestList
   , TestCase $ isValidDrops 4 [1, 2, 2] @?= False
   ]
 
+testsIsValidOwner = TestList
+  [ TestCase $ isValidOwner mockBoard P1 ('a', 1) @?= True
+  , TestCase $ isValidOwner mockBoard P2 ('a', 1) @?= False
+  , TestCase $ isValidOwner mockBoard P2 ('b', 1) @?= False
+  ]
+
 testsMove = TestList
   [ testsIsValidCount
   , testsIsValidDrops
