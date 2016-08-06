@@ -1,25 +1,12 @@
 module Validation where
 
-import Data.Char (digitToInt)
-import Data.Maybe (mapMaybe, catMaybes)
+import Data.Maybe (mapMaybe)
 import Data.List (nub)
 
 import Tak
 import Board
 import Cell
 import Conversion
-
--- carry limit, stack height
-isValidCount :: Game -> Move -> Bool
-isValidCount g (count, xy, _, _) = let
-  b = board g
-  validStackHeight = case getCell b xy of
-    Just c -> getHeight c >= count
-    Nothing -> False
-  in count <= size g && validStackHeight
-
-isValidDrops :: Count -> Drops -> Bool
-isValidDrops c d = c == sum d
 
 checkRoad :: Board -> (Cell -> Bool) -> [Cell] -> Cell -> Bool
 checkRoad b isEnd visited c@(Cell xy _) = let
@@ -59,25 +46,4 @@ checkEnd g
     p1FlatsCount = length $ getPlacedByPlayerAndType b P1 F
     p2FlatsCount = length $ getPlacedByPlayerAndType b P2 F
     winner = if p1FlatsCount > p2FlatsCount then P1 else P2
-
-isUnderControl :: Game -> XY -> Bool
-isUnderControl g xy = case getCell (board g) xy of
-  Nothing -> False
-  Just c -> case getOwner c of
-    Nothing -> False
-    Just owner -> owner == player g
-
-isDropzoneClear :: Game -> Move -> Bool
-isDropzoneClear g (count, xy, dir, drops) = let
-  b = board g
-  Just cell = getCell b xy
-  nextCells = catMaybes $ getNextCells b cell dir drops
-
-  -- conditions
-  inBounds = length nextCells == length drops
-  initToppable = all isToppable $ init nextCells
-  end = last nextCells
-  isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)
-
-  in inBounds && initToppable && isValidEnd
 

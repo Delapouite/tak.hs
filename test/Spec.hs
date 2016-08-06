@@ -6,6 +6,7 @@ import CommandSpec
 import ConversionSpec
 import DisplaySpec
 import GameSpec
+import MoveSpec
 import ParserSpec
 import PlaceSpec
 import StackSpec
@@ -21,6 +22,7 @@ main = runTestTT $ TestList
   , testsConversion
   , testsDisplay
   , testsGame
+  , testsMove
   , testsParser
   , testsPlace
   , testsStack

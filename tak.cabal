@@ -22,6 +22,7 @@ library
                      , Conversion
                      , Display
                      , Game
+                     , Move
                      , Parser
                      , Place
                      , Stack
@@ -63,10 +64,11 @@ test-suite tak-test
   other-modules:       Mock
                      , BoardSpec
                      , CellSpec
-                     , GameSpec
                      , CommandSpec
                      , ConversionSpec
                      , DisplaySpec
+                     , GameSpec
+                     , MoveSpec
                      , ParserSpec
                      , PlaceSpec
                      , StackSpec
