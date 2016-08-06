@@ -2,8 +2,6 @@ module Move where
 
 -- validators for Move command
 
-import Data.Maybe (catMaybes)
-
 import Tak
 import Board
 import Cell
@@ -30,7 +28,7 @@ isUnderControl b p xy = case getCell b xy of
 isDropzoneClear :: Board -> Move -> Bool
 isDropzoneClear b (count, xy, dir, drops) = let
   Just cell = getCell b xy
-  nextCells = catMaybes $ getNextCells b cell dir drops
+  nextCells = getNextCells b cell dir drops
 
   -- conditions
   inBounds = length nextCells == length drops

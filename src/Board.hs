@@ -36,9 +36,9 @@ getNeighbors b xy = let
   xys = mapMaybe (getNextXY (getSize b) xy) [North, East, South, West]
   in mapMaybe (getCell b) xys
 
-getNextCells :: Board -> Cell -> Dir -> Drops -> [Maybe Cell]
+getNextCells :: Board -> Cell -> Dir -> Drops -> [Cell]
 getNextCells b (Cell xy _) dir drops =
-  map (getCell b) $ getNextXYs (getSize b) xy dir drops
+  mapMaybe (getCell b) $ getNextXYs (getSize b) xy dir drops
 
 getNextXY :: Size -> XY -> Dir -> Maybe XY
 getNextXY s (x, y) d = let
