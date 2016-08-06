@@ -26,15 +26,16 @@ isUnderControl b p xy = case getCell b xy of
     Just owner -> owner == p
 
 isDropzoneClear :: Board -> Move -> Bool
-isDropzoneClear b (count, xy, dir, drops) = let
-  Just cell = getCell b xy
-  nextCells = getNextCells b cell dir drops
+isDropzoneClear b (count, xy, dir, drops) = case getCell b xy of
+  Nothing -> False
+  Just cell -> let
+    nextCells = getNextCells b cell dir drops
+    end = last nextCells
 
-  -- conditions
-  inBounds = length nextCells == length drops
-  initToppable = all isToppable $ init nextCells
-  end = last nextCells
-  isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)
+    -- conditions
+    inBounds = length nextCells == length drops
+    initToppable = all isToppable $ init nextCells
+    isValidEnd = isToppable end || (hasCap cell && isFlattenable end drops)
 
-  in inBounds && initToppable && isValidEnd
+    in inBounds && initToppable && isValidEnd
 
