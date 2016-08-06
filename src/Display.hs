@@ -57,8 +57,8 @@ showStacks cs = do
   let levels = reverse [0..getMaxHeight cs - 1]
   stackLevels <- mapM (showStackLevel cs) levels
   return $ if null stackLevels
-      then unwords (map (const emptyCell) cs) ++ "\n"
-      else unlines stackLevels
+    then unwords (map (const emptyCell) cs) ++ "\n"
+    else unlines stackLevels
 
 -- top view
 showCell :: Cell -> ROptions Display

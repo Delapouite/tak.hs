@@ -41,17 +41,17 @@ handleMove g@Game {board = b, player = p} m@(count, xy, dir, drops)
 
 handleCommand :: Game -> Command -> (Game, Display)
 handleCommand g a = case a of
-    (Command "show" (coord:_)) -> handleShow g $ toXorY coord
-    (Command "show" _) -> (g, showGame g)
-    (Command "place" (args:_)) -> case parsePlace args of
-      Just (sType, xy) -> handlePlace g xy sType
-      _ -> (g, "Wrong stone type or xy coordinates")
-    (Command "move" (args:_)) -> case parseMove args of
-      Just m -> handleMove g m
-      _ -> (g, "Wrong args for move")
+  (Command "show" (coord:_)) -> handleShow g $ toXorY coord
+  (Command "show" _) -> (g, showGame g)
+  (Command "place" (args:_)) -> case parsePlace args of
+    Just (sType, xy) -> handlePlace g xy sType
+    _ -> (g, "Wrong stone type or xy coordinates")
+  (Command "move" (args:_)) -> case parseMove args of
+    Just m -> handleMove g m
+    _ -> (g, "Wrong args for move")
 
-    -- shortcuts
-    (Command verb _) -> case parseUnknownVerb verb of
-      Just c -> handleCommand g c
-      _ -> (g, "Unknown command")
+  -- shortcuts
+  (Command verb _) -> case parseUnknownVerb verb of
+    Just c -> handleCommand g c
+    _ -> (g, "Unknown command")
 
