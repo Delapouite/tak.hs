@@ -18,8 +18,7 @@ getHeight :: Cell -> Int
 getHeight (Cell _ zs) = length zs
 
 getTopStone :: Cell -> Maybe Stone
-getTopStone (Cell _ []) = Nothing
-getTopStone (Cell _ (s:_)) = Just s
+getTopStone (Cell _ zs) = listToMaybe zs
 
 -- no stones
 isEmpty :: Cell -> Bool

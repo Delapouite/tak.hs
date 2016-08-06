@@ -5,7 +5,7 @@ module Parser where
 import Data.Char (digitToInt, isAlpha, isDigit, toLower, toUpper)
 import Data.List (intercalate, intersperse)
 import Data.List.Split (splitOn)
-import Data.Maybe (isJust)
+import Data.Maybe
 import Text.Read (readMaybe)
 
 import Tak

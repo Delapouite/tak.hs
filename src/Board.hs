@@ -2,7 +2,7 @@ module Board where
 
 import Data.List (find, sortBy, transpose)
 import Data.List.Split (chunksOf)
-import Data.Maybe (mapMaybe)
+import Data.Maybe
 
 import Tak
 import Cell
@@ -50,9 +50,7 @@ getNextXY s (x, y) d = let
   in if isValidXY s xy then Just xy else Nothing
 
 getNextXYs :: Size -> XY -> Dir -> Drops -> [XY]
-getNextXYs s xy dir [d] = case getNextXY s xy dir of
-  Just xy' -> [xy']
-  Nothing -> []
+getNextXYs s xy dir [d] = maybeToList $ getNextXY s xy dir
 getNextXYs s xy dir (d:ds) = let
   [xy'] = getNextXYs s xy dir [d]
   in xy' : getNextXYs s xy' dir ds
