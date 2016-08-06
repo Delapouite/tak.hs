@@ -2,8 +2,20 @@ module MoveSpec where
 
 import Test.HUnit
 
+import Mock
+
 import Tak
 import Move
+
+testsIsValidCount = TestList
+  -- non existing cell
+  [ TestCase $ isValidCount mockBoard (1, ('b', 4), North, []) @?= False
+  -- count should not exceed board size
+  , TestCase $ isValidCount mockBoard (5, ('a', 1), North, []) @?= False
+  -- a,3 only has 1 Stone
+  , TestCase $ isValidCount mockBoard (2, ('a', 3), North, []) @?= False
+  , TestCase $ isValidCount mockBoard (2, ('a', 1), North, []) @?= True
+  ]
 
 testsIsValidDrops = TestList
   [ TestCase $ isValidDrops 3 [3] @?= True
@@ -13,5 +25,6 @@ testsIsValidDrops = TestList
   ]
 
 testsMove = TestList
-  [ testsIsValidDrops
+  [ testsIsValidCount
+  , testsIsValidDrops
   ]
