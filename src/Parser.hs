@@ -24,22 +24,16 @@ parseXY _ = Nothing
 -- PTN: (stone)(square)
 parsePlace :: String -> Maybe (StoneType, XY)
 parsePlace (st:x:y:[]) = case readMaybe [toUpper st] of
-  Just s -> case parseXY [x, y] of
-    Just xy -> Just (s, xy)
-    _ -> Nothing
-  _ -> Nothing
-parsePlace xy = case parseXY xy of
-  Just xy -> Just (F, xy)
-  _ -> Nothing
+  Just s -> (\xy -> (s, xy)) <$> parseXY [x, y]
+  Nothing -> Nothing
+parsePlace xy = (\xy -> (F, xy)) <$> parseXY xy
 
 -- PTN: (count)(square)(direction)(drops count)(stone)
 parseMove :: String -> Maybe Move
 parseMove str = case parseCount str of
   (count, x:y:d:drops) -> case parseXY (x:[y]) of
     Nothing -> Nothing
-    Just xy -> case parseDir d of
-      Nothing -> Nothing
-      Just dir -> Just (count, xy, dir, parseDrops count drops)
+    Just xy -> (\dir -> (count, xy, dir, parseDrops count drops)) <$> parseDir d
   -- not enough chars
   _ -> Nothing
 
