@@ -127,20 +127,20 @@ showXAxis :: Board -> Display
 showXAxis b = unwords . map (: []) $ take (getSize b) xs
 
 showDeck :: Game -> Player -> Display
-showDeck g p = let
-  b = board g
-  total = stoneCount $ size g
-  totalCaps = capCount $ size g
+showDeck Game {board = b, options = o, size = s} p = let
+  total = stoneCount s
+  totalCaps = capCount s
   placedCaps = length $ getPlacedByPlayerAndType b p C
   placed = length (getPlacedByPlayer b p) - placedCaps
   flats = show (total - placed)
-  cap = runReader (showStone (Stone p C)) (options g)
+  cap = runReader (showStone (Stone p C)) o
   caps = show (totalCaps - placedCaps) ++ cap
-  p' = runReader (showPlayer p) (options g)
+  p' = runReader (showPlayer p) o
   in p' ++ "'s deck: " ++ flats ++ " " ++ caps ++ "\n"
 
 showDecks :: Game -> Display
 showDecks g = "\n" ++ showDeck g P1 ++ showDeck g P2
 
 showGame :: Game -> Display
-showGame g = showDecks g ++ runReader (showBoardWithAxes (board g)) (options g)
+showGame g@Game {board = b, options = o} =
+  showDecks g ++ runReader (showBoardWithAxes b) o

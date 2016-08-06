@@ -7,12 +7,10 @@ import Display
 
 -- on turn 1, players place an opponent's stone
 getPlayer :: Game -> Player
-getPlayer g
-  | turn g /= 1 = p
+getPlayer Game {player = p, turn = t}
+  | t /= 1 = p
   | p == P1     = P2
   | otherwise   = P1
-  where
-    p = player g
 
 updateGame :: Game -> Board -> Game
 updateGame g b = let
