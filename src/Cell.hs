@@ -5,9 +5,7 @@ import Tak
 -- associated player
 
 getOwner :: Cell -> Maybe Player
-getOwner c = case getTopStone c of
-  Just (Stone owner _) -> Just owner
-  Nothing -> Nothing
+getOwner = (\(Stone p _) -> p) <$> getTopStone
 
 isOwnedBy :: Player -> Cell -> Bool
 isOwnedBy p c = case getOwner c of
