@@ -7,6 +7,7 @@ import ConversionSpec
 import DisplaySpec
 import GameSpec
 import ParserSpec
+import PlaceSpec
 import StackSpec
 import TPSSpec
 import ValidationSpec
@@ -21,6 +22,7 @@ main = runTestTT $ TestList
   , testsDisplay
   , testsGame
   , testsParser
+  , testsPlace
   , testsStack
   , testsTPS
   , testsValidation

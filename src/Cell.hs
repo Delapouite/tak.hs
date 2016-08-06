@@ -7,8 +7,8 @@ getHeight (Cell _ zs) = length zs
 
 getOwner :: Cell -> Maybe Player
 getOwner c = case getTopStone c of
-  Nothing -> Nothing
   Just (Stone owner _) -> Just owner
+  Nothing -> Nothing
 
 getTopStone :: Cell -> Maybe Stone
 getTopStone (Cell _ []) = Nothing
@@ -32,7 +32,7 @@ isToppable c = case getTopStone c of
 -- S and last drop == 1
 isFlattenable :: Cell -> Drops -> Bool
 isFlattenable c drops = case getTopStone c of
-  Nothing -> False
   -- a cap can only flatten when alone
   Just (Stone _ t) -> t == S && (last drops == 1)
+  Nothing -> False
 

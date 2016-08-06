@@ -8,6 +8,7 @@ import Conversion
 import Display
 import Game
 import Parser
+import Place
 import Validation
 import XY
 
@@ -23,12 +24,13 @@ handleShow g xory = case xory of
 
 handlePlace :: Game -> XY -> StoneType -> (Game, Display)
 handlePlace g xy st
-  | not $ isValidXY (size g) xy   = (g, "Wrong xy coordinates")
-  | not $ canPlace b xy           = (g, "The cell must be empty")
-  | st == C && not (capsInDeck g) = (g, "No more caps in deck")
-  | otherwise                     = updateAndShowGame g $ placeStone b xy (getPlayer g) st
+  | not $ isValidXY (size g) xy     = (g, "Wrong xy coordinates")
+  | not $ canPlace b xy             = (g, "The cell must be empty")
+  | st == C && not (capsInDeck b p) = (g, "No more caps in deck")
+  | otherwise                       = updateAndShowGame g $ placeStone b xy p st
   where
     b = board g
+    p = getPlayer g
 
 handleMove :: Game -> Move -> (Game, Display)
 handleMove g m@(count, xy, dir, drops)

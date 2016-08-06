@@ -21,18 +21,6 @@ isValidCount g (count, xy, _, _) = let
 isValidDrops :: Count -> Drops -> Bool
 isValidDrops c d = c == sum d
 
--- only in empty cells
-canPlace :: Board -> XY -> Bool
-canPlace b xy = case getCell b xy of
-  Just c -> isEmpty c
-  Nothing -> False
-
-capsInDeck :: Game -> Bool
-capsInDeck g = let
-  totalCaps = capCount $ size g
-  placedCaps = length $ getPlacedByPlayerAndType (board g) (player g) C
-  in totalCaps - placedCaps > 0
-
 checkRoad :: Board -> (Cell -> Bool) -> [Cell] -> Cell -> Bool
 checkRoad b isEnd visited c@(Cell xy _) = let
   newNeighbors = filter (`notElem` visited) $ getValidNeighbors b xy
