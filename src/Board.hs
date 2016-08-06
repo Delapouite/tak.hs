@@ -77,11 +77,10 @@ getStacks = map (\(Cell _ zs) -> zs)
 
 -- neighbors owned by same player
 getValidNeighbors :: Board -> XY -> [Cell]
-getValidNeighbors b xy = case getCell b xy of
-  Nothing -> []
-  Just cell -> case getOwner cell of
-    Nothing -> []
-    Just owner -> filter (isOwnedBy owner) $ getNeighbors b xy
+getValidNeighbors b xy = fromMaybe [] $ do
+  cell <- getCell b xy
+  owner <- getOwner cell
+  return $ filter (isOwnedBy owner) $ getNeighbors b xy
 
 isBoardFull :: Board -> Bool
 isBoardFull = not . any isEmpty
