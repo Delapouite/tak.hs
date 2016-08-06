@@ -6,7 +6,7 @@ import Tak
 
 -- turn all stones to F
 flattenStack :: Stack -> Stack
-flattenStack = map (\(Stone p _) -> (Stone p F))
+flattenStack = map (\(Stone p _) -> Stone p F)
 
 popStones :: XY -> Count -> Cell -> Cell
 popStones xy count c@(Cell xy' zs)

@@ -1,3 +1,5 @@
+{-# LANGUAGE TupleSections #-}
+
 module Parser where
 
 import Data.Char (digitToInt, isAlpha, isDigit, toLower, toUpper)
@@ -24,16 +26,16 @@ parseXY _ = Nothing
 -- PTN: (stone)(square)
 parsePlace :: String -> Maybe (StoneType, XY)
 parsePlace (st:x:y:[]) = case readMaybe [toUpper st] of
-  Just s -> (\xy -> (s, xy)) <$> parseXY [x, y]
+  Just s -> (s,) <$> parseXY [x, y]
   Nothing -> Nothing
-parsePlace xy = (\xy -> (F, xy)) <$> parseXY xy
+parsePlace xy = (F,) <$> parseXY xy
 
 -- PTN: (count)(square)(direction)(drops count)(stone)
 parseMove :: String -> Maybe Move
 parseMove str = case parseCount str of
   (count, x:y:d:drops) -> case parseXY (x:[y]) of
     Nothing -> Nothing
-    Just xy -> (\dir -> (count, xy, dir, parseDrops count drops)) <$> parseDir d
+    Just xy -> (count, xy, , parseDrops count drops) <$> parseDir d
   -- not enough chars
   _ -> Nothing
 
