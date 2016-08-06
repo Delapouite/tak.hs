@@ -7,7 +7,6 @@ import Data.Maybe (isJust)
 import Text.Read (readMaybe)
 
 import Tak
-import Conversion
 
 parseCommand :: String -> Command
 -- default

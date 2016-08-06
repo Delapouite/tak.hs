@@ -10,7 +10,6 @@ import Game
 import Move
 import Parser
 import Place
-import Validation
 import XY
 
 handleShow :: Game -> Either X Y -> (Game, Display)

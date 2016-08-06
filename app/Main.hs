@@ -10,9 +10,7 @@ import Text.Read (readMaybe)
 
 import Tak
 import Board
-import Cell
 import Command
-import Conversion
 import Display
 import Parser
 import Validation

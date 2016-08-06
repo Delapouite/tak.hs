@@ -6,7 +6,6 @@ import Data.List (nub)
 import Tak
 import Board
 import Cell
-import Conversion
 
 checkRoad :: Board -> (Cell -> Bool) -> [Cell] -> Cell -> Bool
 checkRoad b isEnd visited c@(Cell xy _) = let

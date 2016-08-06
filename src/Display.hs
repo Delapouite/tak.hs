@@ -6,7 +6,6 @@ import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
 
 import Tak
 import Board
-import Conversion
 
 type ROptions = Reader Options
 
