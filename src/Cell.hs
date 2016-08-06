@@ -1,5 +1,7 @@
 module Cell where
 
+import Data.Maybe
+
 import Tak
 
 -- associated player
@@ -8,9 +10,7 @@ getOwner :: Cell -> Maybe Player
 getOwner c = (\(Stone p _) -> p) <$> getTopStone c
 
 isOwnedBy :: Player -> Cell -> Bool
-isOwnedBy p c = case getOwner c of
-  Just owner -> owner == p
-  Nothing -> False
+isOwnedBy p c = maybe False (==p) $ getOwner c
 
 -- associated stack
 --
@@ -27,20 +27,15 @@ isEmpty (Cell _ zs) = null zs
 
 -- C on top of stack
 isCapped :: Cell -> Bool
-isCapped c = case getTopStone c of
-  Just (Stone _ t) -> t == C
-  Nothing -> False
+isCapped c = maybe False (\(Stone _ t) -> t == C) $ getTopStone c
 
 -- F or empty cell
 isToppable :: Cell -> Bool
-isToppable c = case getTopStone c of
-  Just (Stone _ t) -> t == F
-  Nothing -> True
+isToppable c = maybe True (\(Stone _ t) -> t == F) $ getTopStone c
 
 -- S and last drop == 1
+-- a cap can only flatten when alone
 isFlattenable :: Cell -> Drops -> Bool
-isFlattenable c drops = case getTopStone c of
-  -- a cap can only flatten when alone
-  Just (Stone _ t) -> t == S && (last drops == 1)
-  Nothing -> False
+isFlattenable c drops =
+  maybe False (\(Stone _ t) -> t == S && (last drops == 1)) $ getTopStone c
 

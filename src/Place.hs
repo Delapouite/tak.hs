@@ -2,15 +2,15 @@ module Place where
 
 -- validators for Place command
 
+import Data.Maybe
+
 import Tak
 import Board
 import Cell
 
 -- only in empty cells
 canPlace :: Board -> XY -> Bool
-canPlace b xy = case getCell b xy of
-  Just c -> isEmpty c
-  Nothing -> False
+canPlace b xy = maybe False isEmpty $ getCell b xy
 
 -- player still has caps to play?
 capsInDeck :: Board -> Player -> Bool
