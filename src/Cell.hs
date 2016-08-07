@@ -10,7 +10,7 @@ getOwner :: Cell -> Maybe Player
 getOwner c = (\(Stone p _) -> p) <$> getTopStone c
 
 isOwnedBy :: Player -> Cell -> Bool
-isOwnedBy p c = maybe False (==p) $ getOwner c
+isOwnedBy p c = maybe False (== p) $ getOwner c
 
 -- associated stack
 --

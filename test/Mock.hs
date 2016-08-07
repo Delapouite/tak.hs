@@ -23,3 +23,5 @@ mockBoard =
   , Cell ('c', 2) []
   , Cell ('c', 3) []
   ]
+
+mockSize = 5 :: Int

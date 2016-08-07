@@ -7,7 +7,6 @@ import Data.Maybe
 import Tak
 import Cell
 import Conversion
-import Stack
 import XY
 
 initBoard :: Size -> Board
@@ -90,30 +89,3 @@ toCols b = chunksOf (getSize b) b
 
 toRows :: Board -> [Row]
 toRows = transpose . toCols
-
--- stack
-
-placeStone :: Board -> XY -> Player -> StoneType -> Board
-placeStone b xy p st = map (pushStones xy [Stone p st]) b
-
-moveSubstack :: Board -> Count -> XY -> XY -> Board
-moveSubstack b count fromXY toXY = let
-  Just (Cell _ zs) = getCell b fromXY
-  stones = take count zs
-  b' = map (popStones fromXY count) b
-  in map (pushStones toXY stones) b'
-
-moveStack :: Board -> Move -> Board
-moveStack b m@(_, xy, dir, _) = let
-  size = getSize b
-  reducer acc (xy, drop) = case getNextXY size xy dir of
-    Just xy' -> moveSubstack acc drop xy xy'
-    Nothing -> acc
-  in foldl reducer b $ zipXYandCounts size m
-
-zipXYandCounts :: Size -> Move -> [(XY, Count)]
-zipXYandCounts s (count, xy, dir, drops) = let
-  reducer acc drop = acc ++ [last acc - drop]
-  xys = init $ xy : getNextXYs s xy dir drops
-  counts = foldl reducer [count] $ init drops
-  in zip xys counts

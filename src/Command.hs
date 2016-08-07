@@ -3,7 +3,6 @@ module Command where
 import Control.Monad.Reader
 
 import Tak
-import Board
 import Conversion
 import Display
 import Game

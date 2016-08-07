@@ -8,8 +8,6 @@ import Tak
 import Board
 import Display
 
-mockSize = 5
-
 testsInitBoard = TestList
   [ TestCase $ initBoard 2 @?=
     [ Cell ('a', 1) []
@@ -181,44 +179,6 @@ testsToRows = TestList
     ]
   ]
 
--- stack
-
-mockBoard1 =
-  [ Cell ('a', 2) [Stone P2 F]
-  , Cell ('b', 2) [Stone P1 S, Stone P2 F, Stone P1 F]
-  , Cell ('a', 1) []
-  , Cell ('b', 1) []
-  ]
-
-testsMoveSubstack = TestList
-  [ TestCase $ moveSubstack mockBoard1 1 ('b', 2) ('a', 2) @?=
-    [ Cell ('a', 2) [Stone P1 S, Stone P2 F]
-    , Cell ('b', 2) [Stone P2 F, Stone P1 F]
-    , Cell ('a', 1) []
-    , Cell ('b', 1) []
-    ]
-  , TestCase $ moveSubstack mockBoard1 2 ('b', 2) ('a', 2) @?=
-    [ Cell ('a', 2) [Stone P1 S, Stone P2 F, Stone P2 F]
-    , Cell ('b', 2) [Stone P1 F]
-    , Cell ('a', 1) []
-    , Cell ('b', 1) []
-    ]
-  , TestCase $ moveSubstack mockBoard1 3 ('b', 2) ('a', 2) @?=
-    [ Cell ('a', 2) [Stone P1 S, Stone P2 F, Stone P1 F, Stone P2 F]
-    , Cell ('b', 2) []
-    , Cell ('a', 1) []
-    , Cell ('b', 1) []
-    ]
-  ]
-
-testsZipXYandCounts = TestList
-  [ TestCase $ zipXYandCounts mockSize (1, ('b', 2), East, [1]) @?= [(('b', 2), 1)]
-  , TestCase $ zipXYandCounts mockSize (3, ('b', 2), East, [2, 1]) @?= [(('b', 2), 3), (('c', 2), 1)]
-  , TestCase $ zipXYandCounts mockSize (3, ('b', 2), North, [2, 1]) @?= [(('b', 2), 3), (('b', 3), 1)]
-  , TestCase $ zipXYandCounts mockSize (3, ('b', 2), East, [1, 1, 1]) @?= [(('b', 2), 3), (('c', 2), 2), (('d', 2), 1)]
-  , TestCase $ zipXYandCounts mockSize (4, ('b', 2), East, [1, 2, 1]) @?= [(('b', 2), 4), (('c', 2), 3), (('d', 2), 1)]
-  ]
-
 testsBoard = TestList
   [ testsInitBoard
   , testsSortBoard
@@ -235,6 +195,4 @@ testsBoard = TestList
   , testsIsBoardFull
   , testsToCols
   , testsToRows
-  , testsMoveSubstack
-  , testsZipXYandCounts
   ]
