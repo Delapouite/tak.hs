@@ -79,7 +79,7 @@ getValidNeighbors :: Board -> XY -> [Cell]
 getValidNeighbors b xy = fromMaybe [] $ do
   cell <- getCell b xy
   owner <- getOwner cell
-  return $ filter (isOwnedBy owner) $ getNeighbors b xy
+  pure $ filter (isOwnedBy owner) $ getNeighbors b xy
 
 isBoardFull :: Board -> Bool
 isBoardFull = not . any isEmpty
