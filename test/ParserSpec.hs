@@ -13,6 +13,7 @@ testsParseXY = TestList
 
   , TestCase $ parseXY "b3" @?= Just ('b', 3)
   , TestCase $ parseXY "B3" @?= Just ('b', 3)
+  , TestCase $ parseXY "z9" @?= Just ('z', 9)
   ]
 
 testsParsePlace = TestList

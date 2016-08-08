@@ -34,9 +34,9 @@ parsePlace _ = Nothing
 -- PTN: (count)(square)(direction)(drops count)(stone)
 parseMove :: String -> Maybe Move
 parseMove str = case parseCount str of
-  (count, x:y:d:drops) -> case parseXY (x:[y]) of
-    Nothing -> Nothing
-    Just xy -> (count, xy, , parseDrops count drops) <$> parseDir d
+  (count, x:y:d:drops) -> do
+    xy <- parseXY (x:[y])
+    (count, xy, , parseDrops count drops) <$> parseDir d
   -- not enough chars
   _ -> Nothing
 
