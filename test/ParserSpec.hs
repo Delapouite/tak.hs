@@ -7,15 +7,21 @@ import Display
 import Parser
 
 testsParseXY = TestList
-  [ TestCase $ parseXY "b3" @?= Just ('b', 3)
-  , TestCase $ parseXY "B3" @?= Just ('b', 3)
+  [ TestCase $ parseXY "" @?= Nothing
   , TestCase $ parseXY "3b" @?= Nothing
+  , TestCase $ parseXY "3ba" @?= Nothing
+
+  , TestCase $ parseXY "b3" @?= Just ('b', 3)
+  , TestCase $ parseXY "B3" @?= Just ('b', 3)
   ]
 
 testsParsePlace = TestList
-  [ TestCase $ parsePlace "a" @?= Nothing
+  [ TestCase $ parsePlace "" @?= Nothing
+  , TestCase $ parsePlace "a" @?= Nothing
   , TestCase $ parsePlace "2" @?= Nothing
   , TestCase $ parsePlace "2a" @?= Nothing
+  , TestCase $ parsePlace "f2a" @?= Nothing
+  , TestCase $ parsePlace "Sa2dummy" @?= Nothing
 
   , TestCase $ parsePlace "a2" @?= Just (F, ('a', 2))
   , TestCase $ parsePlace "Fa2" @?= Just (F, ('a', 2))

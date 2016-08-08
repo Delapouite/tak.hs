@@ -18,17 +18,18 @@ parseCommand s = let
   in Command verb args
 
 parseXY :: String -> Maybe XY
-parseXY (x:y:[])
+parseXY [x, y]
   | isAlpha x && isDigit y = Just (toLower x, read [y])
   | otherwise              = Nothing
 parseXY _ = Nothing
 
 -- PTN: (stone)(square)
 parsePlace :: String -> Maybe (StoneType, XY)
-parsePlace (st:x:y:[]) = case readMaybe [toUpper st] of
-  Just s -> (s,) <$> parseXY [x, y]
-  Nothing -> Nothing
-parsePlace xy = (F,) <$> parseXY xy
+parsePlace [st, x, y] = do
+  s <- readMaybe [toUpper st]
+  (s,) <$> parseXY [x, y]
+parsePlace [x, y] = (F,) <$> parseXY [x, y]
+parsePlace _ = Nothing
 
 -- PTN: (count)(square)(direction)(drops count)(stone)
 parseMove :: String -> Maybe Move
