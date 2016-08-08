@@ -59,6 +59,24 @@ parseDrops c str = case reads str :: [(Int, String)] of
   [(drops, _)] -> map digitToInt $ show drops
   [] -> [c]
 
+parseFlag :: String -> Maybe Bool
+parseFlag flag = let
+  f = map toLower flag
+  in if f == "true" then Just True
+     else if f == "false" then Just False
+     else Nothing
+
+-- TODO use lenses
+parseOptionName :: String -> Maybe (Options -> Bool -> Options)
+parseOptionName "colors" = Just (\opt flag -> opt {optColors = flag})
+parseOptionName "big" = Just (\opt flag -> opt {optBig = flag})
+parseOptionName _ = Nothing
+
+parseOption :: String -> String -> Maybe (Options -> Bool -> Options, Bool)
+parseOption opt flag = do
+  setter <- parseOptionName opt
+  (setter,) <$> parseFlag flag
+
 parseUnknownVerb :: Verb -> Maybe Command
 parseUnknownVerb v
   | isJust $ parsePlace v = Just $ Command "place" [v]

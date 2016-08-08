@@ -34,6 +34,7 @@ This project is managed by [Stack](http://docs.haskellstack.org/en/stable/README
 
 `stack exec tak-exe` to launch the game
 `stack exec tak-exe -- --colors` to launch the game with colors
+`stack exec tak-exe -- --big`    to launch the game with full stacks displayed in overview
 
 ### Size of the board
 
@@ -189,6 +190,15 @@ turn 4 / P2> show 3
   F
 . F . . .
 a b c d e
+```
+
+#### options
+
+During runtime you can enable/disable options:
+
+```
+turn 4 / P2> set colors true
+turn 4 / P2> set colors false
 ```
 
 Have a good game! For any questions or suggestions, feel free to open a [GH issue](https://github.com/Delapouite/tak.hs/issues)

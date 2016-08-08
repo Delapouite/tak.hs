@@ -38,8 +38,14 @@ handleMove g@Game {board = b, player = p, size = s} m@(count, xy, dir, drops)
   | not $ isDropzoneClear b m      = (g, "The dropzone is not clear")
   | otherwise                      = updateAndShowGame g $ moveStack b m
 
+handleOption :: Game -> (Options -> Bool -> Options) -> Bool -> (Game, Display)
+handleOption g@Game{options = o} setter flag = let
+  o' = setter o flag
+  in (g {options = o'}, "option set.")
+
+-- global dispatcher
 handleCommand :: Game -> Command -> (Game, Display)
-handleCommand g a = case a of
+handleCommand g c = case c of
   (Command "show" (coord:_)) -> handleShow g $ toXorY coord
   (Command "show" _) -> (g, showGame g)
   (Command "place" (args:_)) -> case parsePlace args of
@@ -48,6 +54,9 @@ handleCommand g a = case a of
   (Command "move" (args:_)) -> case parseMove args of
     Just m -> handleMove g m
     _ -> (g, "Wrong args for move")
+  (Command "set" [opt, flag]) -> case parseOption opt flag of
+    Just (setter, f) -> handleOption g setter f
+    _ -> (g, "Wrong option name or value")
 
   -- shortcuts
   (Command verb _) -> case parseUnknownVerb verb of
