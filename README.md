@@ -1,6 +1,6 @@
 # tak.hs
 
-CLI version of [Tak (the board game)](http://cheapass.com/node/215) playable in hot-seat mode. Written in Haskell to practice.
+CLI version of [Tak (the board game)](https://boardgamegeek.com/boardgame/197405/tak) playable in hot-seat mode. Written in Haskell to practice.
 
 Warning: this game's still in development. So you may still stumble upon a few rough edges.
 
@@ -19,7 +19,7 @@ P2's deck: 16 1c
 ```
 
 Fancy isn't it? Let's discover what this beautiful ASCII art means in the following sections.
-But first, don't forget to read the [rules](http://cheapass.com/sites/default/files/TakBetaRules3-10-16.pdf) otherwise it won't make any sense.
+But first, don't forget to read the [rules](http://cheapass.com/wp-content/uploads/2016/07/Tak-Beta-Rules.pdf) otherwise it won't make any sense.
 Also, there's no Artificial Intelligence support yet, so you need to find a local friend ;)
 
 ## Install
